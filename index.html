@@ -1118,7 +1118,11 @@
       </div>
       <div class="login-field">
         <label>Password</label>
-        <input type="password" id="li-password" placeholder="Masukkan password..." autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()" />
+        <input type="password" id="li-password" placeholder="Masukkan password..." autocomplete="current-password" />
+      </div>
+      <div class="login-field">
+        <label>JSONBin API Key</label>
+        <input type="text" id="li-apikey" placeholder="$2a$10$..." style="font-family:'DM Mono',monospace;font-size:0.82rem;" onkeydown="if(event.key==='Enter')doLogin()" />
       </div>
       <button class="login-btn" id="login-submit-btn" onclick="doLogin()">Masuk</button>
     </div>
@@ -1148,7 +1152,8 @@
     </div>
 
     <div class="login-info" id="login-info-text">
-      Data tersimpan di cloud JSONBin.io — bisa diakses dari perangkat manapun dengan akun yang sama.
+      API Key diperlukan saat login di perangkat baru. Setelah login, sesi tersimpan otomatis.<br>
+      <a href="https://jsonbin.io" target="_blank" style="color:var(--gold);">Dapatkan API Key gratis di jsonbin.io</a>
     </div>
   </div>
 </div>
@@ -1811,16 +1816,52 @@
 // ════════════════════════════════════════════════════
 
 const JSONBIN_BASE = 'https://api.jsonbin.io/v3';
-let currentUser = null;   // { username, binId, apiKey }
+let currentUser = null;   // { username, binId, apiKey, regBinId }
 let cloudData   = null;   // { orders, customers, cashflow, invCounter }
 let syncTimer   = null;
 let pendingSave = false;
 let isSyncing   = false;
 
-// ── Local accounts registry (stored in localStorage per device for credentials)
-function getAccounts() { return JSON.parse(localStorage.getItem('bb_accounts') || '{}'); }
-function saveAccounts(a) { localStorage.setItem('bb_accounts', JSON.stringify(a)); }
+// ════════════════════════════════════════════════════
+//   CLOUD ACCOUNT REGISTRY
+//   Setiap API Key punya 1 "registry bin" → daftar semua akun
+//   { accounts: { username: { passwordHash, dataBinId } } }
+//   Registry bin ID di-cache di localStorage (bisa direkonstruksi)
+// ════════════════════════════════════════════════════
 
+function getCachedRegBinId(apiKey) {
+  const map = JSON.parse(localStorage.getItem('bb_reg_map') || '{}');
+  // key: hash 8 char dari apiKey agar tidak expose full key
+  const k = btoa(apiKey).slice(0,12);
+  return map[k] || null;
+}
+function cacheRegBinId(apiKey, binId) {
+  const map = JSON.parse(localStorage.getItem('bb_reg_map') || '{}');
+  const k = btoa(apiKey).slice(0,12);
+  map[k] = binId;
+  localStorage.setItem('bb_reg_map', JSON.stringify(map));
+}
+
+async function getOrCreateRegistry(apiKey) {
+  let regBinId = getCachedRegBinId(apiKey);
+  if (regBinId) {
+    try {
+      const data = await binRead(apiKey, regBinId);
+      return { regBinId, data };
+    } catch(e) { /* bin tidak valid, buat baru */ }
+  }
+  // Buat registry bin baru
+  const initial = { accounts: {} };
+  regBinId = await binCreate(apiKey, initial);
+  cacheRegBinId(apiKey, regBinId);
+  return { regBinId, data: initial };
+}
+
+async function saveRegistry(apiKey, regBinId, registryData) {
+  await binWrite(apiKey, regBinId, registryData);
+}
+
+// ── Session lokal (hanya info login aktif, bukan password)
 function getSession() { return JSON.parse(localStorage.getItem('bb_session') || 'null'); }
 function saveSession(s) { localStorage.setItem('bb_session', JSON.stringify(s)); }
 function clearSession() { localStorage.removeItem('bb_session'); }
@@ -1966,23 +2007,32 @@ function setLoginLoading(id, loading) {
 async function doLogin() {
   const username = document.getElementById('li-username').value.trim().toLowerCase();
   const password = document.getElementById('li-password').value;
+  const apiKey   = document.getElementById('li-apikey').value.trim();
   setLoginError('');
   if (!username || !password) { setLoginError('Username dan password wajib diisi.'); return; }
-
-  const accounts = getAccounts();
-  if (!accounts[username]) { setLoginError('Akun tidak ditemukan. Silakan daftar terlebih dahulu.'); return; }
+  if (!apiKey || !apiKey.startsWith('$2a$')) { setLoginError('Masukkan API Key JSONBin yang valid.'); return; }
 
   setLoginLoading('login-submit-btn', true);
   try {
-    const hash = await hashPass(password);
-    if (accounts[username].passwordHash !== hash) { setLoginError('Password salah.'); setLoginLoading('login-submit-btn', false); return; }
+    // Cari akun dari cloud registry berdasarkan API Key
+    const { regBinId, data: registry } = await getOrCreateRegistry(apiKey);
+    const accounts = registry.accounts || {};
 
-    const { binId, apiKey } = accounts[username];
-    currentUser = { username, binId, apiKey };
+    if (!accounts[username]) {
+      setLoginError('Akun tidak ditemukan. Pastikan username & API Key benar, atau daftar dulu.');
+      setLoginLoading('login-submit-btn', false); return;
+    }
+    const hash = await hashPass(password);
+    if (accounts[username].passwordHash !== hash) {
+      setLoginError('Password salah.');
+      setLoginLoading('login-submit-btn', false); return;
+    }
+    const { dataBinId } = accounts[username];
+    currentUser = { username, binId: dataBinId, apiKey, regBinId };
     saveSession(currentUser);
     await launchApp();
   } catch(e) {
-    setLoginError('Terjadi kesalahan: ' + e.message);
+    setLoginError('Gagal terhubung: ' + e.message + '. Periksa koneksi dan API Key.');
   }
   setLoginLoading('login-submit-btn', false);
 }
@@ -2000,20 +2050,27 @@ async function doRegister() {
   if (password !== password2) { setLoginError('Konfirmasi password tidak cocok.'); return; }
   if (!apiKey || !apiKey.startsWith('$2a$')) { setLoginError('API Key tidak valid. Salin dari jsonbin.io → API Keys → Secret Key.'); return; }
 
-  const accounts = getAccounts();
-  if (accounts[username]) { setLoginError('Username sudah digunakan. Pilih username lain.'); return; }
-
   setLoginLoading('register-submit-btn', true);
   try {
-    // Create a new bin for this account
+    // Ambil / buat registry dari cloud
+    const { regBinId, data: registry } = await getOrCreateRegistry(apiKey);
+    const accounts = registry.accounts || {};
+
+    if (accounts[username]) { setLoginError('Username sudah digunakan. Pilih username lain.'); setLoginLoading('register-submit-btn', false); return; }
+
+    // Buat data bin baru untuk akun ini
     const initialData = { orders:[], customers:[], cashflow:[], invCounter:100 };
-    const binId = await binCreate(apiKey, initialData);
+    const dataBinId = await binCreate(apiKey, initialData);
 
     const hash = await hashPass(password);
-    accounts[username] = { passwordHash: hash, binId, apiKey };
-    saveAccounts(accounts);
+    accounts[username] = { passwordHash: hash, dataBinId };
+    registry.accounts = accounts;
 
-    currentUser = { username, binId, apiKey };
+    // Simpan registry yang sudah diperbarui ke cloud
+    await saveRegistry(apiKey, regBinId, registry);
+    cacheRegBinId(apiKey, regBinId);
+
+    currentUser = { username, binId: dataBinId, apiKey, regBinId };
     saveSession(currentUser);
     cloudData = initialData;
     await launchApp();
@@ -2109,16 +2166,19 @@ async function saveSetupApiKey() {
   if (!currentUser) return;
 
   try {
-    // Test key by creating new bin
+    // Migrasi data ke API Key baru: buat registry + data bin baru
+    const { regBinId: newRegBinId, data: newRegistry } = await getOrCreateRegistry(key);
+    const newAccounts = newRegistry.accounts || {};
     const initialData = { orders: cloudData.orders||[], customers: cloudData.customers||[], cashflow: cloudData.cashflow||[], invCounter: cloudData.invCounter||100 };
-    const newBinId = await binCreate(key, initialData);
-    // Update account
-    const accounts = getAccounts();
-    accounts[currentUser.username].apiKey = key;
-    accounts[currentUser.username].binId  = newBinId;
-    saveAccounts(accounts);
-    currentUser.apiKey = key;
-    currentUser.binId  = newBinId;
+    const newDataBinId = await binCreate(key, initialData);
+    const hash = currentUser._passwordHash || '';
+    newAccounts[currentUser.username] = { passwordHash: hash, dataBinId: newDataBinId };
+    newRegistry.accounts = newAccounts;
+    await saveRegistry(key, newRegBinId, newRegistry);
+    cacheRegBinId(key, newRegBinId);
+    currentUser.apiKey  = key;
+    currentUser.binId   = newDataBinId;
+    currentUser.regBinId = newRegBinId;
     saveSession(currentUser);
     document.getElementById('setup-modal').style.display = 'none';
     showToast('✅ API Key berhasil diperbarui!');
