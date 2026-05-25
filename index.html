@@ -4,8 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Invoice · BersihBersih</title>
-
-  <!-- PWA -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1C2D5A">
   <meta name="mobile-web-app-capable" content="yes">
@@ -14,16 +12,10 @@
   <meta name="apple-mobile-web-app-title" content="BersihBersih">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
-
-  <!-- SEO & Open Graph -->
   <meta name="description" content="Aplikasi invoice profesional untuk jasa kebersihan BersihBersih">
   <meta property="og:title" content="Invoice · BersihBersih">
   <meta property="og:description" content="Buat invoice jasa kebersihan dengan cepat dan profesional">
-  <meta property="og:image" content="icons/og-image.png">
   <meta property="og:type" content="website">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="icons/og-image.png">
-
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
@@ -896,8 +888,295 @@
       .nav-tab { padding: 12px 14px; font-size: 0.78rem; }
     }
   </style>
+
+<!-- ══════════════════════════ LOGIN OVERLAY CSS ══════════════════════════ -->
+<style>
+/* ── SYNC INDICATOR ── */
+.sync-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.5px;
+  padding: 4px 12px; border-radius: 50px;
+  transition: all .3s;
+}
+.sync-badge.syncing { background: rgba(184,146,42,0.15); color: var(--gold-light); border: 1px solid var(--gold-border); }
+.sync-badge.synced  { background: rgba(45,122,74,0.15);  color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+.sync-badge.offline { background: rgba(200,60,60,0.12);  color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+.sync-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.sync-dot.pulse { animation: pulse-dot 1.2s ease-in-out infinite; }
+@keyframes pulse-dot { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.4; transform:scale(.7); } }
+
+/* ── USER CHIP IN HEADER ── */
+.user-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(184,146,42,0.12); border: 1px solid var(--gold-border);
+  border-radius: 50px; padding: 5px 12px 5px 6px;
+  cursor: pointer; transition: background .2s;
+  font-size: 0.78rem; color: var(--cream-light); font-weight: 500;
+}
+.user-chip:hover { background: rgba(184,146,42,0.2); }
+.user-avatar {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; font-weight: 800; color: var(--navy);
+  flex-shrink: 0;
+}
+
+/* ── LOGIN FULLSCREEN OVERLAY ── */
+#login-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: #0d1728;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.login-card {
+  width: 100%; max-width: 420px;
+  background: #1a2647;
+  border: 1px solid rgba(184,146,42,0.3);
+  border-radius: 20px;
+  padding: 40px 36px 36px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+  animation: slideUp .4s ease;
+}
+.login-brand {
+  text-align: center; margin-bottom: 32px;
+}
+.login-brand .brand-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem; font-weight: 900;
+  color: var(--gold-bright);
+  line-height: 1;
+}
+.login-brand .brand-sub {
+  font-size: 0.75rem; letter-spacing: 3px; text-transform: uppercase;
+  color: rgba(253,250,244,0.4); margin-top: 6px;
+}
+.login-title {
+  font-size: 1rem; font-weight: 600; color: var(--cream-light);
+  margin-bottom: 24px; text-align: center;
+}
+.login-tabs {
+  display: flex; margin-bottom: 24px;
+  background: rgba(255,255,255,0.06); border-radius: 10px; padding: 4px;
+}
+.login-tab {
+  flex: 1; padding: 9px; text-align: center;
+  font-size: 0.83rem; font-weight: 600; color: rgba(253,250,244,0.5);
+  cursor: pointer; border-radius: 8px; transition: all .2s;
+  background: none; border: none; font-family: 'DM Sans', sans-serif;
+}
+.login-tab.active { background: var(--gold); color: var(--navy); }
+
+.login-field { margin-bottom: 16px; }
+.login-field label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--gold-light); display: block; margin-bottom: 6px; }
+.login-field input {
+  width: 100%; padding: 12px 16px;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(184,146,42,0.3);
+  border-radius: 10px; color: var(--cream-light);
+  font-size: 0.95rem; font-family: 'DM Sans', sans-serif;
+  outline: none; transition: border-color .2s, box-shadow .2s;
+}
+.login-field input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(184,146,42,0.18); }
+.login-field input::placeholder { color: rgba(253,250,244,0.35); }
+
+.login-btn {
+  width: 100%; padding: 14px;
+  background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+  color: var(--navy); font-weight: 800; font-size: 0.95rem;
+  border: none; border-radius: 50px; cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  box-shadow: 0 6px 22px rgba(184,146,42,0.35);
+  transition: transform .2s, box-shadow .2s;
+  margin-top: 8px;
+}
+.login-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(184,146,42,0.45); }
+.login-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.login-error {
+  background: rgba(200,60,60,0.12); border: 1px solid rgba(200,60,60,0.3);
+  color: #f87171; border-radius: 8px; padding: 10px 14px;
+  font-size: 0.83rem; margin-bottom: 14px; display: none;
+}
+.login-info {
+  font-size: 0.78rem; color: rgba(253,250,244,0.4); text-align: center; margin-top: 16px; line-height: 1.6;
+}
+
+/* ── SETUP BIN MODAL ── */
+#setup-modal {
+  position: fixed; inset: 0; z-index: 9998;
+  background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px; display: none;
+}
+.setup-card {
+  width: 100%; max-width: 520px;
+  background: #1a2647;
+  border: 1px solid rgba(184,146,42,0.3);
+  border-radius: 20px; padding: 32px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+}
+.setup-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--cream-light); margin-bottom: 12px; }
+.setup-desc { font-size: 0.85rem; color: rgba(253,250,244,0.6); margin-bottom: 20px; line-height: 1.7; }
+.setup-steps { counter-reset: steps; }
+.setup-step {
+  counter-increment: steps;
+  display: flex; gap: 14px; align-items: flex-start;
+  margin-bottom: 16px; font-size: 0.85rem; color: rgba(253,250,244,0.75);
+}
+.setup-step::before {
+  content: counter(steps); min-width: 24px; height: 24px;
+  background: var(--gold-pale); border: 1px solid var(--gold-border);
+  color: var(--gold); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.72rem; font-weight: 800; flex-shrink: 0;
+}
+.setup-link { color: var(--gold); text-decoration: underline; }
+.setup-field { margin: 20px 0 12px; }
+.setup-field label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--gold-light); display: block; margin-bottom: 6px; }
+.setup-field input {
+  width: 100%; padding: 11px 14px;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(184,146,42,0.3);
+  border-radius: 10px; color: var(--cream-light);
+  font-size: 0.9rem; font-family: 'DM Mono', monospace;
+  outline: none; transition: border-color .2s;
+}
+.setup-field input:focus { border-color: var(--gold); }
+.setup-field input::placeholder { color: rgba(253,250,244,0.35); font-family: 'DM Sans', sans-serif; }
+.setup-actions { display: flex; gap: 12px; margin-top: 16px; }
+
+/* ── LOADING SCREEN ── */
+#app-loading {
+  position: fixed; inset: 0; z-index: 9990;
+  background: #0d1728;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 20px;
+}
+.loading-logo { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 900; color: var(--gold-bright); }
+.loading-sub { font-size: 0.8rem; color: rgba(253,250,244,0.4); letter-spacing: 2px; text-transform: uppercase; }
+.loading-spinner {
+  width: 36px; height: 36px;
+  border: 3px solid rgba(184,146,42,0.2);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── LOGOUT DROPDOWN ── */
+.user-dropdown {
+  position: absolute; top: calc(100% + 10px); right: 0;
+  background: #1a2647; border: 1px solid rgba(184,146,42,0.25);
+  border-radius: 12px; padding: 8px; min-width: 200px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  display: none; z-index: 200;
+  animation: fadeIn .15s ease;
+}
+.user-dropdown.open { display: block; }
+.user-dropdown-item {
+  padding: 10px 14px; border-radius: 8px;
+  font-size: 0.85rem; color: rgba(253,250,244,0.75);
+  cursor: pointer; display: flex; align-items: center; gap: 10px;
+  transition: background .15s;
+}
+.user-dropdown-item:hover { background: rgba(184,146,42,0.1); color: var(--cream-light); }
+.user-dropdown-item.danger { color: #f87171; }
+.user-dropdown-item.danger:hover { background: rgba(200,60,60,0.1); }
+.user-dropdown-divider { height: 1px; background: rgba(184,146,42,0.15); margin: 4px 0; }
+.user-dropdown-header { padding: 10px 14px 6px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(253,250,244,0.35); font-weight: 700; }
+.header-right-wrap { position: relative; display: flex; align-items: center; gap: 10px; }
+</style>
 </head>
 <body>
+
+<!-- ══════════════════════════ APP LOADING ══════════════════════════ -->
+<div id="app-loading">
+  <div class="loading-logo">bersih<span style="color:var(--cream-light)">bersih</span></div>
+  <div class="loading-sub">Sistem Manajemen Invoice</div>
+  <div class="loading-spinner"></div>
+</div>
+
+<!-- ══════════════════════════ LOGIN OVERLAY ══════════════════════════ -->
+<div id="login-overlay" style="display:none;">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="brand-name">bersihbersih</div>
+      <div class="brand-sub">Sistem Manajemen Invoice</div>
+    </div>
+
+    <div class="login-tabs">
+      <button class="login-tab active" id="tab-login-btn" onclick="showLoginForm('login')">Masuk</button>
+      <button class="login-tab" id="tab-register-btn" onclick="showLoginForm('register')">Daftar Akun</button>
+    </div>
+
+    <div id="login-error" class="login-error"></div>
+
+    <!-- Login Form -->
+    <div id="form-login">
+      <div class="login-field">
+        <label>Username / Kode Akun</label>
+        <input type="text" id="li-username" placeholder="Masukkan username..." autocomplete="username" />
+      </div>
+      <div class="login-field">
+        <label>Password</label>
+        <input type="password" id="li-password" placeholder="Masukkan password..." autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()" />
+      </div>
+      <button class="login-btn" id="login-submit-btn" onclick="doLogin()">Masuk</button>
+    </div>
+
+    <!-- Register Form -->
+    <div id="form-register" style="display:none;">
+      <div class="login-field">
+        <label>Username (huruf kecil, angka, tanpa spasi)</label>
+        <input type="text" id="reg-username" placeholder="Cth: bersihbersih_team" autocomplete="username" />
+      </div>
+      <div class="login-field">
+        <label>Password</label>
+        <input type="password" id="reg-password" placeholder="Min. 6 karakter" autocomplete="new-password" />
+      </div>
+      <div class="login-field">
+        <label>Konfirmasi Password</label>
+        <input type="password" id="reg-password2" placeholder="Ulangi password" autocomplete="new-password" onkeydown="if(event.key==='Enter')doRegister()" />
+      </div>
+      <div class="login-field">
+        <label>JSONBin API Key <span style="color:rgba(253,250,244,0.4);text-transform:none;font-weight:400;">(untuk menyimpan data ke cloud)</span></label>
+        <input type="text" id="reg-apikey" placeholder="$2a$10$..." style="font-family:'DM Mono',monospace;font-size:0.82rem;" />
+      </div>
+      <button class="login-btn" id="register-submit-btn" onclick="doRegister()">Buat Akun & Mulai</button>
+      <div class="login-info">
+        Butuh API Key gratis? <a href="https://jsonbin.io" target="_blank" style="color:var(--gold);">Daftar di jsonbin.io</a> lalu buka <strong>API Keys</strong> dan salin Secret Key.
+      </div>
+    </div>
+
+    <div class="login-info" id="login-info-text">
+      Data tersimpan di cloud JSONBin.io — bisa diakses dari perangkat manapun dengan akun yang sama.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ SETUP BIN MODAL ══════════════════════════ -->
+<div id="setup-modal">
+  <div class="setup-card">
+    <div class="setup-title">🔧 Persiapan Pertama Kali</div>
+    <div class="setup-desc">Akun baru memerlukan penyimpanan cloud (JSONBin.io) gratis. Ikuti langkah berikut:</div>
+    <div class="setup-steps">
+      <div class="setup-step">Buka <a href="https://jsonbin.io" target="_blank" class="setup-link">jsonbin.io</a> dan buat akun gratis.</div>
+      <div class="setup-step">Setelah login, klik <strong>API Keys</strong> di menu kiri, salin <strong>Secret Key</strong>.</div>
+      <div class="setup-step">Masukkan Secret Key di kolom bawah, lalu klik Simpan.</div>
+    </div>
+    <div class="setup-field">
+      <label>JSONBin Secret Key</label>
+      <input type="text" id="setup-apikey" placeholder="$2a$10$..." />
+    </div>
+    <div id="setup-error" style="color:#f87171;font-size:0.82rem;margin-bottom:8px;display:none;"></div>
+    <div class="setup-actions">
+      <button class="btn-secondary" onclick="document.getElementById('setup-modal').style.display='none'" style="padding:11px 20px;flex:1;">Nanti</button>
+      <button class="btn-primary" onclick="saveSetupApiKey()" style="padding:11px 24px;flex:2;">Simpan & Lanjutkan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ MAIN APP ══════════════════════════ -->
+<div id="main-app" style="display:none;">
 
 <!-- HEADER -->
 <header>
@@ -906,8 +1185,29 @@
          onerror="this.style.display='none';document.querySelector('.logo-fallback').style.display='block'">
     <div class="logo-fallback">bersih<span style="color:var(--gold-bright)">bersih</span></div>
   </div>
-  <div class="header-right">
-    <span class="badge-invoice">✦ Sistem Manajemen</span>
+  <div class="header-right-wrap">
+    <div class="sync-badge syncing" id="sync-badge">
+      <div class="sync-dot pulse" id="sync-dot"></div>
+      <span id="sync-label">Memuat...</span>
+    </div>
+    <div class="user-chip" id="user-chip-btn" onclick="toggleUserDropdown()">
+      <div class="user-avatar" id="user-avatar-initial">?</div>
+      <span id="user-chip-name">—</span>
+    </div>
+    <div class="user-dropdown" id="user-dropdown">
+      <div class="user-dropdown-header" id="dropdown-username-label">Username</div>
+      <div class="user-dropdown-divider"></div>
+      <div class="user-dropdown-item" onclick="showSyncNow()">
+        <span>🔄</span> Sinkronisasi Sekarang
+      </div>
+      <div class="user-dropdown-item" onclick="openSetupModal()">
+        <span>🔧</span> Pengaturan Cloud
+      </div>
+      <div class="user-dropdown-divider"></div>
+      <div class="user-dropdown-item danger" onclick="doLogout()">
+        <span>🚪</span> Keluar
+      </div>
+    </div>
   </div>
 </header>
 
@@ -937,9 +1237,6 @@
   </button>
 </nav>
 
-<!-- ══════════════════════════════════
-     PAGE: BUAT INVOICE
-══════════════════════════════════ -->
 <div id="page-invoice" class="page active">
 <main>
 
@@ -1499,42 +1796,391 @@
   </div>
 </div>
 
+
+<!-- TOAST -->
+<div id="toast">✓ Berhasil!</div>
+
+</div><!-- end #main-app -->
+
 <script>
-// ══════════════════════════════════
-//   STATE & STORAGE
-// ══════════════════════════════════
-let items = [];
-let invCounter = parseInt(localStorage.getItem('bb_inv_counter') || '100');
+// ════════════════════════════════════════════════════
+//   CLOUD AUTH & SYNC ENGINE (JSONBin.io)
+//   Strategi: setiap akun = 1 bin di JSONBin
+//   Struktur data: { orders:[], customers:[], cashflow:[], invCounter:100 }
+//   Akun disimpan di localStorage (kredensial) + cloud (data)
+// ════════════════════════════════════════════════════
 
-// Load / save helpers
-function loadOrders() { return JSON.parse(localStorage.getItem('bb_orders') || '[]'); }
-function saveOrders(orders) { localStorage.setItem('bb_orders', JSON.stringify(orders)); }
-function loadCustomers() { return JSON.parse(localStorage.getItem('bb_customers') || '[]'); }
-function saveCustomers(custs) { localStorage.setItem('bb_customers', JSON.stringify(custs)); }
+const JSONBIN_BASE = 'https://api.jsonbin.io/v3';
+let currentUser = null;   // { username, binId, apiKey }
+let cloudData   = null;   // { orders, customers, cashflow, invCounter }
+let syncTimer   = null;
+let pendingSave = false;
+let isSyncing   = false;
 
-// ══════════════════════════════════
-//   INIT
-// ══════════════════════════════════
-window.addEventListener('DOMContentLoaded', () => {
+// ── Local accounts registry (stored in localStorage per device for credentials)
+function getAccounts() { return JSON.parse(localStorage.getItem('bb_accounts') || '{}'); }
+function saveAccounts(a) { localStorage.setItem('bb_accounts', JSON.stringify(a)); }
+
+function getSession() { return JSON.parse(localStorage.getItem('bb_session') || 'null'); }
+function saveSession(s) { localStorage.setItem('bb_session', JSON.stringify(s)); }
+function clearSession() { localStorage.removeItem('bb_session'); }
+
+// ── Hash password (simple, since data isn't highly sensitive)
+async function hashPass(pass) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pass + 'bb_salt_2026'));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+// ── JSONBin API calls
+async function binCreate(apiKey, data) {
+  const r = await fetch(`${JSONBIN_BASE}/b`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Master-Key': apiKey, 'X-Bin-Private': 'false' },
+    body: JSON.stringify(data)
+  });
+  if (!r.ok) throw new Error(`Gagal buat bin: ${r.status}`);
+  const j = await r.json();
+  return j.metadata.id;
+}
+
+async function binRead(apiKey, binId) {
+  const r = await fetch(`${JSONBIN_BASE}/b/${binId}/latest`, {
+    headers: { 'X-Master-Key': apiKey }
+  });
+  if (!r.ok) throw new Error(`Gagal baca bin: ${r.status}`);
+  const j = await r.json();
+  return j.record;
+}
+
+async function binWrite(apiKey, binId, data) {
+  const r = await fetch(`${JSONBIN_BASE}/b/${binId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'X-Master-Key': apiKey },
+    body: JSON.stringify(data)
+  });
+  if (!r.ok) throw new Error(`Gagal tulis bin: ${r.status}`);
+  return true;
+}
+
+// ── Sync UI helpers
+function setSyncState(state, label) {
+  const badge = document.getElementById('sync-badge');
+  const dot   = document.getElementById('sync-dot');
+  const lbl   = document.getElementById('sync-label');
+  if (!badge) return;
+  badge.className = `sync-badge ${state}`;
+  dot.className   = `sync-dot${state === 'syncing' ? ' pulse' : ''}`;
+  lbl.textContent = label;
+}
+
+// ── Pull data from cloud
+async function syncFromCloud() {
+  if (!currentUser) return;
+  setSyncState('syncing', 'Memuat...');
+  isSyncing = true;
+  try {
+    const data = await binRead(currentUser.apiKey, currentUser.binId);
+    cloudData = {
+      orders: data.orders || [],
+      customers: data.customers || [],
+      cashflow: data.cashflow || [],
+      invCounter: data.invCounter || 100
+    };
+    // Sync invCounter to local
+    invCounter = cloudData.invCounter;
+    localStorage.setItem('bb_inv_counter', invCounter);
+    setSyncState('synced', '✓ Tersinkron');
+    updateBadges();
+  } catch(e) {
+    setSyncState('offline', 'Offline');
+    console.warn('Sync gagal:', e);
+  }
+  isSyncing = false;
+}
+
+// ── Push data to cloud (debounced)
+async function pushToCloud() {
+  if (!currentUser || !cloudData) return;
+  setSyncState('syncing', 'Menyimpan...');
+  try {
+    await binWrite(currentUser.apiKey, currentUser.binId, cloudData);
+    setSyncState('synced', '✓ Tersimpan');
+    pendingSave = false;
+  } catch(e) {
+    setSyncState('offline', 'Gagal simpan');
+    pendingSave = true;
+    console.warn('Push gagal:', e);
+  }
+}
+
+function scheduleSave() {
+  pendingSave = true;
+  if (syncTimer) clearTimeout(syncTimer);
+  syncTimer = setTimeout(pushToCloud, 1500);
+}
+
+// ── Data accessors (replaces localStorage)
+function loadOrders()    { return cloudData ? [...(cloudData.orders   || [])] : []; }
+function loadCustomers() { return cloudData ? [...(cloudData.customers|| [])] : []; }
+function loadCashflow()  { return cloudData ? [...(cloudData.cashflow || [])] : []; }
+
+function saveOrders(orders) {
+  if (!cloudData) return;
+  cloudData.orders = orders;
+  scheduleSave();
+}
+function saveCustomers(custs) {
+  if (!cloudData) return;
+  cloudData.customers = custs;
+  scheduleSave();
+}
+function saveCashflow(data) {
+  if (!cloudData) return;
+  cloudData.cashflow = data;
+  scheduleSave();
+}
+
+// ════════════════════════════════════════════════════
+//   LOGIN UI LOGIC
+// ════════════════════════════════════════════════════
+function showLoginForm(form) {
+  document.getElementById('form-login').style.display    = form === 'login'    ? '' : 'none';
+  document.getElementById('form-register').style.display = form === 'register' ? '' : 'none';
+  document.getElementById('tab-login-btn').classList.toggle('active', form === 'login');
+  document.getElementById('tab-register-btn').classList.toggle('active', form === 'register');
+  document.getElementById('login-error').style.display = 'none';
+}
+
+function setLoginError(msg) {
+  const el = document.getElementById('login-error');
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+
+function setLoginLoading(id, loading) {
+  const btn = document.getElementById(id);
+  btn.disabled = loading;
+  btn.textContent = loading ? 'Mohon tunggu...' : (id === 'login-submit-btn' ? 'Masuk' : 'Buat Akun & Mulai');
+}
+
+async function doLogin() {
+  const username = document.getElementById('li-username').value.trim().toLowerCase();
+  const password = document.getElementById('li-password').value;
+  setLoginError('');
+  if (!username || !password) { setLoginError('Username dan password wajib diisi.'); return; }
+
+  const accounts = getAccounts();
+  if (!accounts[username]) { setLoginError('Akun tidak ditemukan. Silakan daftar terlebih dahulu.'); return; }
+
+  setLoginLoading('login-submit-btn', true);
+  try {
+    const hash = await hashPass(password);
+    if (accounts[username].passwordHash !== hash) { setLoginError('Password salah.'); setLoginLoading('login-submit-btn', false); return; }
+
+    const { binId, apiKey } = accounts[username];
+    currentUser = { username, binId, apiKey };
+    saveSession(currentUser);
+    await launchApp();
+  } catch(e) {
+    setLoginError('Terjadi kesalahan: ' + e.message);
+  }
+  setLoginLoading('login-submit-btn', false);
+}
+
+async function doRegister() {
+  const username = document.getElementById('reg-username').value.trim().toLowerCase();
+  const password = document.getElementById('reg-password').value;
+  const password2 = document.getElementById('reg-password2').value;
+  const apiKey  = document.getElementById('reg-apikey').value.trim();
+  setLoginError('');
+
+  if (!username || !password || !password2) { setLoginError('Semua kolom wajib diisi.'); return; }
+  if (!/^[a-z0-9_]{3,30}$/.test(username)) { setLoginError('Username hanya huruf kecil, angka, underscore (3-30 karakter).'); return; }
+  if (password.length < 6) { setLoginError('Password minimal 6 karakter.'); return; }
+  if (password !== password2) { setLoginError('Konfirmasi password tidak cocok.'); return; }
+  if (!apiKey || !apiKey.startsWith('$2a$')) { setLoginError('API Key tidak valid. Salin dari jsonbin.io → API Keys → Secret Key.'); return; }
+
+  const accounts = getAccounts();
+  if (accounts[username]) { setLoginError('Username sudah digunakan. Pilih username lain.'); return; }
+
+  setLoginLoading('register-submit-btn', true);
+  try {
+    // Create a new bin for this account
+    const initialData = { orders:[], customers:[], cashflow:[], invCounter:100 };
+    const binId = await binCreate(apiKey, initialData);
+
+    const hash = await hashPass(password);
+    accounts[username] = { passwordHash: hash, binId, apiKey };
+    saveAccounts(accounts);
+
+    currentUser = { username, binId, apiKey };
+    saveSession(currentUser);
+    cloudData = initialData;
+    await launchApp();
+    showToast('🎉 Akun berhasil dibuat!');
+  } catch(e) {
+    setLoginError('Gagal membuat akun: ' + e.message + '. Pastikan API Key benar.');
+  }
+  setLoginLoading('register-submit-btn', false);
+}
+
+async function launchApp() {
+  document.getElementById('login-overlay').style.display = 'none';
+  document.getElementById('app-loading').style.display = 'flex';
+  document.getElementById('app-loading').querySelector('.loading-sub').textContent = 'Memuat data dari cloud...';
+
+  // Update header
+  document.getElementById('user-chip-name').textContent = currentUser.username;
+  document.getElementById('user-avatar-initial').textContent = currentUser.username[0].toUpperCase();
+  document.getElementById('dropdown-username-label').textContent = '@' + currentUser.username;
+
+  // Pull from cloud first
+  if (!cloudData) {
+    try {
+      const data = await binRead(currentUser.apiKey, currentUser.binId);
+      cloudData = {
+        orders: data.orders || [],
+        customers: data.customers || [],
+        cashflow: data.cashflow || [],
+        invCounter: data.invCounter || 100
+      };
+    } catch(e) {
+      cloudData = { orders:[], customers:[], cashflow:[], invCounter:100 };
+      setSyncState('offline', 'Offline');
+    }
+  }
+
+  invCounter = cloudData.invCounter || 100;
+  localStorage.setItem('bb_inv_counter', invCounter);
+
+  // Show app
+  document.getElementById('app-loading').style.display = 'none';
+  document.getElementById('main-app').style.display = 'block';
+
+  // Init invoice app
+  initInvoiceApp();
+
+  // Auto-refresh every 30s
+  setInterval(async () => {
+    if (!pendingSave) await syncFromCloud();
+  }, 30000);
+}
+
+function doLogout() {
+  if (pendingSave) {
+    if (!confirm('Ada data yang belum tersimpan ke cloud. Tetap keluar?')) return;
+  }
+  clearSession();
+  currentUser = null;
+  cloudData = null;
+  document.getElementById('main-app').style.display = 'none';
+  document.getElementById('login-overlay').style.display = 'flex';
+  document.getElementById('user-dropdown').classList.remove('open');
+  showLoginForm('login');
+}
+
+function toggleUserDropdown() {
+  document.getElementById('user-dropdown').classList.toggle('open');
+}
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#user-chip-btn') && !e.target.closest('#user-dropdown')) {
+    document.getElementById('user-dropdown')?.classList.remove('open');
+  }
+});
+
+async function showSyncNow() {
+  document.getElementById('user-dropdown').classList.remove('open');
+  await syncFromCloud();
+  showToast('🔄 Data berhasil disinkronisasi!');
+  // Re-render current tab
+  renderHistory(); renderDashboard(); updateBadges();
+}
+
+function openSetupModal() {
+  document.getElementById('user-dropdown').classList.remove('open');
+  document.getElementById('setup-modal').style.display = 'flex';
+}
+
+async function saveSetupApiKey() {
+  const key = document.getElementById('setup-apikey').value.trim();
+  const errEl = document.getElementById('setup-error');
+  errEl.style.display = 'none';
+  if (!key || !key.startsWith('$2a$')) { errEl.textContent = 'API Key tidak valid.'; errEl.style.display = 'block'; return; }
+  if (!currentUser) return;
+
+  try {
+    // Test key by creating new bin
+    const initialData = { orders: cloudData.orders||[], customers: cloudData.customers||[], cashflow: cloudData.cashflow||[], invCounter: cloudData.invCounter||100 };
+    const newBinId = await binCreate(key, initialData);
+    // Update account
+    const accounts = getAccounts();
+    accounts[currentUser.username].apiKey = key;
+    accounts[currentUser.username].binId  = newBinId;
+    saveAccounts(accounts);
+    currentUser.apiKey = key;
+    currentUser.binId  = newBinId;
+    saveSession(currentUser);
+    document.getElementById('setup-modal').style.display = 'none';
+    showToast('✅ API Key berhasil diperbarui!');
+    setSyncState('synced', '✓ Tersinkron');
+  } catch(e) {
+    errEl.textContent = 'Gagal: ' + e.message;
+    errEl.style.display = 'block';
+  }
+}
+
+// ════════════════════════════════════════════════════
+//   APP INIT (called after login)
+// ════════════════════════════════════════════════════
+function initInvoiceApp() {
+  invCounter = cloudData.invCounter || 100;
   generateInvNumber();
   setDates();
+  items = [];
   addItem(); addItem();
   updateBadges();
   populateMonthFilter();
   populateCFMonthFilter();
   renderCustomerSuggestions();
-  // Set default cashflow date to today
+  cfItems = [];
+  renderCFItems();
   const today = new Date();
   document.getElementById('cf-date').value = toInputDate(today);
-  // Init category filter for default type
   setCFType('income');
-  // Init CF items
-  renderCFItems();
-  // Track manual edits on amount
   document.getElementById('cf-amount-input').addEventListener('input', function() {
     this.dataset.manualEdit = '1';
   });
+  setSyncState('synced', '✓ Tersinkron');
+}
+
+// ════════════════════════════════════════════════════
+//   BOOT: Check existing session
+// ════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', async () => {
+  const session = getSession();
+  if (session && session.username && session.binId && session.apiKey) {
+    currentUser = session;
+    document.getElementById('user-chip-name').textContent = currentUser.username;
+    document.getElementById('user-avatar-initial').textContent = currentUser.username[0].toUpperCase();
+    document.getElementById('dropdown-username-label').textContent = '@' + currentUser.username;
+    await launchApp();
+  } else {
+    document.getElementById('app-loading').style.display = 'none';
+    document.getElementById('login-overlay').style.display = 'flex';
+  }
 });
+
+</script>
+<script>
+// ══ INVOICE APP STATE ══
+// State vars (initialized in initInvoiceApp)
+let items = [];
+let invCounter = 100;
+
+// loadOrders, saveOrders, loadCustomers, saveCustomers, loadCashflow, saveCashflow
+// are defined in the Cloud Engine above.
+
+// INIT is handled by initInvoiceApp() called after login.
 
 // ══════════════════════════════════
 //   TAB NAVIGATION
@@ -1566,6 +2212,7 @@ function updateBadges() {
 function generateInvNumber() {
   invCounter++;
   localStorage.setItem('bb_inv_counter', invCounter);
+  if (cloudData) { cloudData.invCounter = invCounter; scheduleSave(); }
   const d = new Date();
   const ym = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}`;
   document.getElementById('invNumber').value = `BB-${ym}-${String(invCounter).padStart(3,'0')}`;
@@ -2415,8 +3062,7 @@ function showCFItemsDetail(items) {
   modal.classList.add('open');
 }
 
-function loadCashflow() { return JSON.parse(localStorage.getItem('bb_cashflow') || '[]'); }
-function saveCashflow(data) { localStorage.setItem('bb_cashflow', JSON.stringify(data)); }
+// loadCashflow / saveCashflow defined in cloud engine above
 
 function setCFType(type) {
   cfCurrentType = type;
@@ -2595,6 +3241,18 @@ printStyle.textContent = `
 `;
 document.head.appendChild(printStyle);
 </script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('SW registered:', reg.scope))
+        .catch(err => console.log('SW error:', err));
+    });
+  }
+</script>
+</body>
+</html>
 
 <script>
   if ('serviceWorker' in navigator) {
