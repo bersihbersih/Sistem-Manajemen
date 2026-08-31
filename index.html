@@ -71,6 +71,21 @@
     .logo-img { height: 40px; width: auto; object-fit: contain; filter: brightness(1.05); }
     .logo-fallback { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 900; color: var(--gold-bright); display: none; }
     .header-right { display: flex; align-items: center; gap: 0.8rem; }
+    .btn-install {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--gold-bright); color: var(--navy-dark);
+      font-size: 0.78rem; font-weight: 700; letter-spacing: 0.3px;
+      padding: 8px 14px; border-radius: 50px; border: none;
+      cursor: pointer; text-decoration: none; white-space: nowrap;
+      transition: background .2s, transform .15s;
+    }
+    .btn-install:hover { background: var(--gold-light); transform: translateY(-1px); }
+    .btn-install:active { transform: translateY(0); }
+    .btn-install.hidden { display: none; }
+    @media (max-width: 640px) {
+      .btn-install span.btn-install-text { display: none; }
+      .btn-install { padding: 8px 10px; }
+    }
     .badge-invoice {
       font-size: 0.72rem; font-weight: 700; letter-spacing: 2px;
       text-transform: uppercase; color: var(--gold-light);
@@ -1113,16 +1128,12 @@
     <!-- Login Form -->
     <div id="form-login">
       <div class="login-field">
-        <label>Username / Kode Akun</label>
-        <input type="text" id="li-username" placeholder="Masukkan username..." autocomplete="username" />
+        <label>Email</label>
+        <input type="email" id="li-email" placeholder="email@contoh.com" autocomplete="email" onkeydown="if(event.key==='Enter')doLogin()" />
       </div>
       <div class="login-field">
         <label>Password</label>
-        <input type="password" id="li-password" placeholder="Masukkan password..." autocomplete="current-password" />
-      </div>
-      <div class="login-field">
-        <label>JSONBin API Key</label>
-        <input type="text" id="li-apikey" placeholder="$2a$10$..." style="font-family:'DM Mono',monospace;font-size:0.82rem;" onkeydown="if(event.key==='Enter')doLogin()" />
+        <input type="password" id="li-password" placeholder="Masukkan password..." autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()" />
       </div>
       <button class="login-btn" id="login-submit-btn" onclick="doLogin()">Masuk</button>
     </div>
@@ -1134,6 +1145,10 @@
         <input type="text" id="reg-username" placeholder="Cth: bersihbersih_team" autocomplete="username" />
       </div>
       <div class="login-field">
+        <label>Email</label>
+        <input type="email" id="reg-email" placeholder="email@contoh.com" autocomplete="email" />
+      </div>
+      <div class="login-field">
         <label>Password</label>
         <input type="password" id="reg-password" placeholder="Min. 6 karakter" autocomplete="new-password" />
       </div>
@@ -1141,41 +1156,25 @@
         <label>Konfirmasi Password</label>
         <input type="password" id="reg-password2" placeholder="Ulangi password" autocomplete="new-password" onkeydown="if(event.key==='Enter')doRegister()" />
       </div>
-      <div class="login-field">
-        <label>JSONBin API Key <span style="color:rgba(253,250,244,0.4);text-transform:none;font-weight:400;">(untuk menyimpan data ke cloud)</span></label>
-        <input type="text" id="reg-apikey" placeholder="$2a$10$..." style="font-family:'DM Mono',monospace;font-size:0.82rem;" />
-      </div>
       <button class="login-btn" id="register-submit-btn" onclick="doRegister()">Buat Akun & Mulai</button>
       <div class="login-info">
-        Butuh API Key gratis? <a href="https://jsonbin.io" target="_blank" style="color:var(--gold);">Daftar di jsonbin.io</a> lalu buka <strong>API Keys</strong> dan salin Secret Key.
+        Daftar gratis — data tersimpan aman di Google Firebase ☁️
       </div>
     </div>
 
     <div class="login-info" id="login-info-text">
-      API Key diperlukan saat login di perangkat baru. Setelah login, sesi tersimpan otomatis.<br>
-      <a href="https://jsonbin.io" target="_blank" style="color:var(--gold);">Dapatkan API Key gratis di jsonbin.io</a>
+      Login menggunakan email & password. Sesi tersimpan otomatis di perangkat ini.
     </div>
   </div>
 </div>
 
-<!-- ══════════════════════════ SETUP BIN MODAL ══════════════════════════ -->
-<div id="setup-modal">
+<!-- ══════════════════════════ SETUP MODAL (hidden, kept for structure) ══════════════════════════ -->
+<div id="setup-modal" style="display:none;">
   <div class="setup-card">
-    <div class="setup-title">🔧 Persiapan Pertama Kali</div>
-    <div class="setup-desc">Akun baru memerlukan penyimpanan cloud (JSONBin.io) gratis. Ikuti langkah berikut:</div>
-    <div class="setup-steps">
-      <div class="setup-step">Buka <a href="https://jsonbin.io" target="_blank" class="setup-link">jsonbin.io</a> dan buat akun gratis.</div>
-      <div class="setup-step">Setelah login, klik <strong>API Keys</strong> di menu kiri, salin <strong>Secret Key</strong>.</div>
-      <div class="setup-step">Masukkan Secret Key di kolom bawah, lalu klik Simpan.</div>
-    </div>
-    <div class="setup-field">
-      <label>JSONBin Secret Key</label>
-      <input type="text" id="setup-apikey" placeholder="$2a$10$..." />
-    </div>
-    <div id="setup-error" style="color:#f87171;font-size:0.82rem;margin-bottom:8px;display:none;"></div>
+    <div class="setup-title">☁️ Firebase Cloud</div>
+    <div class="setup-desc">Aplikasi ini menggunakan Google Firebase untuk menyimpan data secara otomatis. Tidak diperlukan konfigurasi tambahan.</div>
     <div class="setup-actions">
-      <button class="btn-secondary" onclick="document.getElementById('setup-modal').style.display='none'" style="padding:11px 20px;flex:1;">Nanti</button>
-      <button class="btn-primary" onclick="saveSetupApiKey()" style="padding:11px 24px;flex:2;">Simpan & Lanjutkan</button>
+      <button class="btn-primary" onclick="document.getElementById('setup-modal').style.display='none'" style="padding:11px 24px;flex:1;">Mengerti</button>
     </div>
   </div>
 </div>
@@ -1191,6 +1190,9 @@
     <div class="logo-fallback">bersih<span style="color:var(--gold-bright)">bersih</span></div>
   </div>
   <div class="header-right-wrap">
+    <button class="btn-install hidden" id="btn-install" onclick="handleInstallClick()">
+      <span>📲</span><span class="btn-install-text">Install App</span>
+    </button>
     <div class="sync-badge syncing" id="sync-badge">
       <div class="sync-dot pulse" id="sync-dot"></div>
       <span id="sync-label">Memuat...</span>
@@ -1812,96 +1814,86 @@
 //   CLOUD AUTH & SYNC ENGINE (JSONBin.io)
 //   Strategi: setiap akun = 1 bin di JSONBin
 //   Struktur data: { orders:[], customers:[], cashflow:[], invCounter:100 }
-//   Akun disimpan di localStorage (kredensial) + cloud (data)
+// ════════════════════════════════════════════════════
+//   FIREBASE CLOUD ENGINE
+//   Menggantikan JSONBin.io dengan Google Firebase Firestore
+//   Setup: Ganti firebaseConfig di bawah dengan config project Firebase kamu
 // ════════════════════════════════════════════════════
 
-const JSONBIN_BASE = 'https://api.jsonbin.io/v3';
-let currentUser = null;   // { username, binId, apiKey, regBinId }
+// ── FIREBASE CONFIG ──
+// Langkah setup:
+// 1. Buka https://console.firebase.google.com
+// 2. Buat project baru (gratis)
+// 3. Klik "Add App" → Web App
+// 4. Salin firebaseConfig dan tempel di sini
+// 5. Di Firebase Console → Build → Firestore Database → Create database (production mode)
+// 6. Di Authentication → Sign-in method → Enable "Email/Password"
+// 7. Di Firestore → Rules → paste rules berikut:
+//    rules_version = '2';
+//    service cloud.firestore {
+//      match /databases/{database}/documents {
+//        match /users/{userId}/{document=**} {
+//          allow read, write: if request.auth != null && request.auth.uid == userId;
+//        }
+//        match /usernames/{username} {
+//          allow read: if true;
+//          allow write: if request.auth != null;
+//        }
+//      }
+//    }
+
+const FIREBASE_CONFIG = {
+apiKey: "AIzaSyB4SmqSXlGf1wrNsEDLZ1xtzCf5PmMFsbA",
+  authDomain: "bersihbersih-app.firebaseapp.com",
+  projectId: "bersihbersih-app",
+  storageBucket: "bersihbersih-app.firebasestorage.app",
+  messagingSenderId: "1055170371893",
+  appId: "1:1055170371893:web:1595498ed15d014ed66c7c",
+  measurementId: "G-SJKYYXJJZ3"
+};
+
+// ── Firebase SDK (loaded via CDN) ──
+let _auth = null;
+let _db   = null;
+let _firebase_ready = false;
+
+async function initFirebase() {
+  if (_firebase_ready) return true;
+  // Check config
+  if (FIREBASE_CONFIG.apiKey === "GANTI_DENGAN_API_KEY_FIREBASE_KAMU") {
+    console.warn('Firebase belum dikonfigurasi!');
+    return false;
+  }
+  try {
+    const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    const { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+
+    const app = initializeApp(FIREBASE_CONFIG);
+    _auth = getAuth(app);
+    _db   = getFirestore(app);
+
+    window._fbAuth = { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut };
+    window._fbStore = { doc, getDoc, setDoc, updateDoc, onSnapshot };
+    _firebase_ready = true;
+    return true;
+  } catch(e) {
+    console.error('Firebase init error:', e);
+    return false;
+  }
+}
+
+let currentUser = null;   // { username, uid, email }
 let cloudData   = null;   // { orders, customers, cashflow, invCounter }
 let syncTimer   = null;
 let pendingSave = false;
 let isSyncing   = false;
+let _unsubSnapshot = null;
 
-// ════════════════════════════════════════════════════
-//   CLOUD ACCOUNT REGISTRY
-//   Setiap API Key punya 1 "registry bin" → daftar semua akun
-//   { accounts: { username: { passwordHash, dataBinId } } }
-//   Registry bin ID di-cache di localStorage (bisa direkonstruksi)
-// ════════════════════════════════════════════════════
-
-function getCachedRegBinId(apiKey) {
-  const map = JSON.parse(localStorage.getItem('bb_reg_map') || '{}');
-  // key: hash 8 char dari apiKey agar tidak expose full key
-  const k = btoa(apiKey).slice(0,12);
-  return map[k] || null;
-}
-function cacheRegBinId(apiKey, binId) {
-  const map = JSON.parse(localStorage.getItem('bb_reg_map') || '{}');
-  const k = btoa(apiKey).slice(0,12);
-  map[k] = binId;
-  localStorage.setItem('bb_reg_map', JSON.stringify(map));
-}
-
-async function getOrCreateRegistry(apiKey) {
-  let regBinId = getCachedRegBinId(apiKey);
-  if (regBinId) {
-    try {
-      const data = await binRead(apiKey, regBinId);
-      return { regBinId, data };
-    } catch(e) { /* bin tidak valid, buat baru */ }
-  }
-  // Buat registry bin baru
-  const initial = { accounts: {} };
-  regBinId = await binCreate(apiKey, initial);
-  cacheRegBinId(apiKey, regBinId);
-  return { regBinId, data: initial };
-}
-
-async function saveRegistry(apiKey, regBinId, registryData) {
-  await binWrite(apiKey, regBinId, registryData);
-}
-
-// ── Session lokal (hanya info login aktif, bukan password)
-function getSession() { return JSON.parse(localStorage.getItem('bb_session') || 'null'); }
-function saveSession(s) { localStorage.setItem('bb_session', JSON.stringify(s)); }
-function clearSession() { localStorage.removeItem('bb_session'); }
-
-// ── Hash password (simple, since data isn't highly sensitive)
-async function hashPass(pass) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pass + 'bb_salt_2026'));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-}
-
-// ── JSONBin API calls
-async function binCreate(apiKey, data) {
-  const r = await fetch(`${JSONBIN_BASE}/b`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Master-Key': apiKey, 'X-Bin-Private': 'false' },
-    body: JSON.stringify(data)
-  });
-  if (!r.ok) throw new Error(`Gagal buat bin: ${r.status}`);
-  const j = await r.json();
-  return j.metadata.id;
-}
-
-async function binRead(apiKey, binId) {
-  const r = await fetch(`${JSONBIN_BASE}/b/${binId}/latest`, {
-    headers: { 'X-Master-Key': apiKey }
-  });
-  if (!r.ok) throw new Error(`Gagal baca bin: ${r.status}`);
-  const j = await r.json();
-  return j.record;
-}
-
-async function binWrite(apiKey, binId, data) {
-  const r = await fetch(`${JSONBIN_BASE}/b/${binId}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', 'X-Master-Key': apiKey },
-    body: JSON.stringify(data)
-  });
-  if (!r.ok) throw new Error(`Gagal tulis bin: ${r.status}`);
-  return true;
-}
+// ── Session lokal
+function getSession() { return JSON.parse(localStorage.getItem('bb_session_v2') || 'null'); }
+function saveSession(s) { localStorage.setItem('bb_session_v2', JSON.stringify(s)); }
+function clearSession() { localStorage.removeItem('bb_session_v2'); }
 
 // ── Sync UI helpers
 function setSyncState(state, label) {
@@ -1914,20 +1906,27 @@ function setSyncState(state, label) {
   lbl.textContent = label;
 }
 
-// ── Pull data from cloud
+// ── Read data from Firestore
 async function syncFromCloud() {
-  if (!currentUser) return;
+  if (!currentUser || !_firebase_ready) return;
   setSyncState('syncing', 'Memuat...');
   isSyncing = true;
   try {
-    const data = await binRead(currentUser.apiKey, currentUser.binId);
-    cloudData = {
-      orders: data.orders || [],
-      customers: data.customers || [],
-      cashflow: data.cashflow || [],
-      invCounter: data.invCounter || 100
-    };
-    // Sync invCounter to local
+    const { doc, getDoc } = window._fbStore;
+    const ref = doc(_db, 'users', currentUser.uid, 'data', 'main');
+    const snap = await getDoc(ref);
+    if (snap.exists()) {
+      const data = snap.data();
+      cloudData = {
+        orders:     data.orders     || [],
+        customers:  data.customers  || [],
+        cashflow:   data.cashflow   || [],
+        invCounter: data.invCounter || 100
+      };
+    } else {
+      cloudData = { orders:[], customers:[], cashflow:[], invCounter:100 };
+      await pushToCloud();
+    }
     invCounter = cloudData.invCounter;
     localStorage.setItem('bb_inv_counter', invCounter);
     setSyncState('synced', '✓ Tersinkron');
@@ -1939,12 +1938,14 @@ async function syncFromCloud() {
   isSyncing = false;
 }
 
-// ── Push data to cloud (debounced)
+// ── Write data to Firestore
 async function pushToCloud() {
-  if (!currentUser || !cloudData) return;
+  if (!currentUser || !cloudData || !_firebase_ready) return;
   setSyncState('syncing', 'Menyimpan...');
   try {
-    await binWrite(currentUser.apiKey, currentUser.binId, cloudData);
+    const { doc, setDoc } = window._fbStore;
+    const ref = doc(_db, 'users', currentUser.uid, 'data', 'main');
+    await setDoc(ref, cloudData);
     setSyncState('synced', '✓ Tersimpan');
     pendingSave = false;
   } catch(e) {
@@ -1960,10 +1961,10 @@ function scheduleSave() {
   syncTimer = setTimeout(pushToCloud, 1500);
 }
 
-// ── Data accessors (replaces localStorage)
-function loadOrders()    { return cloudData ? [...(cloudData.orders   || [])] : []; }
-function loadCustomers() { return cloudData ? [...(cloudData.customers|| [])] : []; }
-function loadCashflow()  { return cloudData ? [...(cloudData.cashflow || [])] : []; }
+// ── Data accessors
+function loadOrders()    { return cloudData ? [...(cloudData.orders    || [])] : []; }
+function loadCustomers() { return cloudData ? [...(cloudData.customers || [])] : []; }
+function loadCashflow()  { return cloudData ? [...(cloudData.cashflow  || [])] : []; }
 
 function saveOrders(orders) {
   if (!cloudData) return;
@@ -2005,78 +2006,87 @@ function setLoginLoading(id, loading) {
 }
 
 async function doLogin() {
-  const username = document.getElementById('li-username').value.trim().toLowerCase();
+  const email    = document.getElementById('li-email').value.trim();
   const password = document.getElementById('li-password').value;
-  const apiKey   = document.getElementById('li-apikey').value.trim();
   setLoginError('');
-  if (!username || !password) { setLoginError('Username dan password wajib diisi.'); return; }
-  if (!apiKey || !apiKey.startsWith('$2a$')) { setLoginError('Masukkan API Key JSONBin yang valid.'); return; }
+  if (!email || !password) { setLoginError('Email dan password wajib diisi.'); return; }
 
   setLoginLoading('login-submit-btn', true);
   try {
-    // Cari akun dari cloud registry berdasarkan API Key
-    const { regBinId, data: registry } = await getOrCreateRegistry(apiKey);
-    const accounts = registry.accounts || {};
+    const ok = await initFirebase();
+    if (!ok) { setLoginError('Firebase belum dikonfigurasi. Hubungi administrator.'); setLoginLoading('login-submit-btn', false); return; }
 
-    if (!accounts[username]) {
-      setLoginError('Akun tidak ditemukan. Pastikan username & API Key benar, atau daftar dulu.');
-      setLoginLoading('login-submit-btn', false); return;
-    }
-    const hash = await hashPass(password);
-    if (accounts[username].passwordHash !== hash) {
-      setLoginError('Password salah.');
-      setLoginLoading('login-submit-btn', false); return;
-    }
-    const { dataBinId } = accounts[username];
-    currentUser = { username, binId: dataBinId, apiKey, regBinId };
+    const { signInWithEmailAndPassword } = window._fbAuth;
+    const cred = await signInWithEmailAndPassword(_auth, email, password);
+    const uid = cred.user.uid;
+
+    // Ambil username dari Firestore
+    const { doc, getDoc } = window._fbStore;
+    const profileRef = doc(_db, 'users', uid, 'profile', 'info');
+    const profileSnap = await getDoc(profileRef);
+    const username = profileSnap.exists() ? profileSnap.data().username : email.split('@')[0];
+
+    currentUser = { uid, username, email };
     saveSession(currentUser);
     await launchApp();
   } catch(e) {
-    setLoginError('Gagal terhubung: ' + e.message + '. Periksa koneksi dan API Key.');
+    let msg = 'Login gagal. ';
+    if (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') msg += 'Email atau password salah.';
+    else if (e.code === 'auth/too-many-requests') msg += 'Terlalu banyak percobaan. Coba lagi nanti.';
+    else msg += e.message;
+    setLoginError(msg);
   }
   setLoginLoading('login-submit-btn', false);
 }
 
 async function doRegister() {
-  const username = document.getElementById('reg-username').value.trim().toLowerCase();
-  const password = document.getElementById('reg-password').value;
+  const username  = document.getElementById('reg-username').value.trim().toLowerCase();
+  const email     = document.getElementById('reg-email').value.trim();
+  const password  = document.getElementById('reg-password').value;
   const password2 = document.getElementById('reg-password2').value;
-  const apiKey  = document.getElementById('reg-apikey').value.trim();
   setLoginError('');
 
-  if (!username || !password || !password2) { setLoginError('Semua kolom wajib diisi.'); return; }
+  if (!username || !email || !password || !password2) { setLoginError('Semua kolom wajib diisi.'); return; }
   if (!/^[a-z0-9_]{3,30}$/.test(username)) { setLoginError('Username hanya huruf kecil, angka, underscore (3-30 karakter).'); return; }
   if (password.length < 6) { setLoginError('Password minimal 6 karakter.'); return; }
   if (password !== password2) { setLoginError('Konfirmasi password tidak cocok.'); return; }
-  if (!apiKey || !apiKey.startsWith('$2a$')) { setLoginError('API Key tidak valid. Salin dari jsonbin.io → API Keys → Secret Key.'); return; }
 
   setLoginLoading('register-submit-btn', true);
   try {
-    // Ambil / buat registry dari cloud
-    const { regBinId, data: registry } = await getOrCreateRegistry(apiKey);
-    const accounts = registry.accounts || {};
+    const ok = await initFirebase();
+    if (!ok) { setLoginError('Firebase belum dikonfigurasi. Hubungi administrator.'); setLoginLoading('register-submit-btn', false); return; }
 
-    if (accounts[username]) { setLoginError('Username sudah digunakan. Pilih username lain.'); setLoginLoading('register-submit-btn', false); return; }
+    // Cek username sudah dipakai belum
+    const { doc, getDoc, setDoc } = window._fbStore;
+    const usernameRef = doc(_db, 'usernames', username);
+    const usernameSnap = await getDoc(usernameRef);
+    if (usernameSnap.exists()) { setLoginError('Username sudah digunakan. Pilih username lain.'); setLoginLoading('register-submit-btn', false); return; }
 
-    // Buat data bin baru untuk akun ini
+    // Buat akun Firebase Auth
+    const { createUserWithEmailAndPassword } = window._fbAuth;
+    const cred = await createUserWithEmailAndPassword(_auth, email, password);
+    const uid = cred.user.uid;
+
+    // Simpan profil & klaim username
+    await setDoc(doc(_db, 'users', uid, 'profile', 'info'), { username, email, createdAt: new Date().toISOString() });
+    await setDoc(usernameRef, { uid, email });
+
+    // Buat data awal
     const initialData = { orders:[], customers:[], cashflow:[], invCounter:100 };
-    const dataBinId = await binCreate(apiKey, initialData);
+    await setDoc(doc(_db, 'users', uid, 'data', 'main'), initialData);
 
-    const hash = await hashPass(password);
-    accounts[username] = { passwordHash: hash, dataBinId };
-    registry.accounts = accounts;
-
-    // Simpan registry yang sudah diperbarui ke cloud
-    await saveRegistry(apiKey, regBinId, registry);
-    cacheRegBinId(apiKey, regBinId);
-
-    currentUser = { username, binId: dataBinId, apiKey, regBinId };
+    currentUser = { uid, username, email };
     saveSession(currentUser);
     cloudData = initialData;
     await launchApp();
     showToast('🎉 Akun berhasil dibuat!');
   } catch(e) {
-    setLoginError('Gagal membuat akun: ' + e.message + '. Pastikan API Key benar.');
+    let msg = 'Gagal membuat akun. ';
+    if (e.code === 'auth/email-already-in-use') msg += 'Email sudah digunakan.';
+    else if (e.code === 'auth/invalid-email') msg += 'Format email tidak valid.';
+    else if (e.code === 'auth/weak-password') msg += 'Password terlalu lemah.';
+    else msg += e.message;
+    setLoginError(msg);
   }
   setLoginLoading('register-submit-btn', false);
 }
@@ -2091,33 +2101,20 @@ async function launchApp() {
   document.getElementById('user-avatar-initial').textContent = currentUser.username[0].toUpperCase();
   document.getElementById('dropdown-username-label').textContent = '@' + currentUser.username;
 
-  // Pull from cloud first
+  // Pull from cloud
   if (!cloudData) {
-    try {
-      const data = await binRead(currentUser.apiKey, currentUser.binId);
-      cloudData = {
-        orders: data.orders || [],
-        customers: data.customers || [],
-        cashflow: data.cashflow || [],
-        invCounter: data.invCounter || 100
-      };
-    } catch(e) {
-      cloudData = { orders:[], customers:[], cashflow:[], invCounter:100 };
-      setSyncState('offline', 'Offline');
-    }
+    await syncFromCloud();
   }
 
-  invCounter = cloudData.invCounter || 100;
+  invCounter = cloudData ? (cloudData.invCounter || 100) : 100;
   localStorage.setItem('bb_inv_counter', invCounter);
 
-  // Show app
   document.getElementById('app-loading').style.display = 'none';
   document.getElementById('main-app').style.display = 'block';
 
-  // Init invoice app
   initInvoiceApp();
 
-  // Auto-refresh every 30s
+  // Auto-refresh setiap 30 detik
   setInterval(async () => {
     if (!pendingSave) await syncFromCloud();
   }, 30000);
@@ -2125,7 +2122,11 @@ async function launchApp() {
 
 function doLogout() {
   if (pendingSave) {
-    if (!confirm('Ada data yang belum tersimpan ke cloud. Tetap keluar?')) return;
+    if (!confirm('Ada data yang belum tersimpan. Tetap keluar?')) return;
+  }
+  if (_firebase_ready && _auth) {
+    const { signOut } = window._fbAuth;
+    signOut(_auth).catch(() => {});
   }
   clearSession();
   currentUser = null;
@@ -2149,7 +2150,6 @@ async function showSyncNow() {
   document.getElementById('user-dropdown').classList.remove('open');
   await syncFromCloud();
   showToast('🔄 Data berhasil disinkronisasi!');
-  // Re-render current tab
   renderHistory(); renderDashboard(); updateBadges();
 }
 
@@ -2158,42 +2158,16 @@ function openSetupModal() {
   document.getElementById('setup-modal').style.display = 'flex';
 }
 
+// Dummy saveSetupApiKey (tidak dipakai lagi, tapi dijaga agar tidak error)
 async function saveSetupApiKey() {
-  const key = document.getElementById('setup-apikey').value.trim();
-  const errEl = document.getElementById('setup-error');
-  errEl.style.display = 'none';
-  if (!key || !key.startsWith('$2a$')) { errEl.textContent = 'API Key tidak valid.'; errEl.style.display = 'block'; return; }
-  if (!currentUser) return;
-
-  try {
-    // Migrasi data ke API Key baru: buat registry + data bin baru
-    const { regBinId: newRegBinId, data: newRegistry } = await getOrCreateRegistry(key);
-    const newAccounts = newRegistry.accounts || {};
-    const initialData = { orders: cloudData.orders||[], customers: cloudData.customers||[], cashflow: cloudData.cashflow||[], invCounter: cloudData.invCounter||100 };
-    const newDataBinId = await binCreate(key, initialData);
-    const hash = currentUser._passwordHash || '';
-    newAccounts[currentUser.username] = { passwordHash: hash, dataBinId: newDataBinId };
-    newRegistry.accounts = newAccounts;
-    await saveRegistry(key, newRegBinId, newRegistry);
-    cacheRegBinId(key, newRegBinId);
-    currentUser.apiKey  = key;
-    currentUser.binId   = newDataBinId;
-    currentUser.regBinId = newRegBinId;
-    saveSession(currentUser);
-    document.getElementById('setup-modal').style.display = 'none';
-    showToast('✅ API Key berhasil diperbarui!');
-    setSyncState('synced', '✓ Tersinkron');
-  } catch(e) {
-    errEl.textContent = 'Gagal: ' + e.message;
-    errEl.style.display = 'block';
-  }
+  document.getElementById('setup-modal').style.display = 'none';
 }
 
 // ════════════════════════════════════════════════════
 //   APP INIT (called after login)
 // ════════════════════════════════════════════════════
 function initInvoiceApp() {
-  invCounter = cloudData.invCounter || 100;
+  invCounter = cloudData ? (cloudData.invCounter || 100) : 100;
   generateInvNumber();
   setDates();
   items = [];
@@ -2214,16 +2188,26 @@ function initInvoiceApp() {
 }
 
 // ════════════════════════════════════════════════════
-//   BOOT: Check existing session
+//   BOOT: Check existing session + Firebase Auth state
 // ════════════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', async () => {
   const session = getSession();
-  if (session && session.username && session.binId && session.apiKey) {
+  if (session && session.uid && session.username) {
     currentUser = session;
     document.getElementById('user-chip-name').textContent = currentUser.username;
     document.getElementById('user-avatar-initial').textContent = currentUser.username[0].toUpperCase();
     document.getElementById('dropdown-username-label').textContent = '@' + currentUser.username;
-    await launchApp();
+
+    // Init firebase dan launch
+    const ok = await initFirebase();
+    if (ok) {
+      await launchApp();
+    } else {
+      // Firebase belum dikonfigurasi — tampilkan login agar user bisa coba lagi
+      document.getElementById('app-loading').style.display = 'none';
+      document.getElementById('login-overlay').style.display = 'flex';
+      setLoginError('⚠️ Firebase belum dikonfigurasi. Minta administrator untuk mengisi FIREBASE_CONFIG di kode.');
+    }
   } else {
     document.getElementById('app-loading').style.display = 'none';
     document.getElementById('login-overlay').style.display = 'flex';
@@ -3311,17 +3295,59 @@ document.head.appendChild(printStyle);
     });
   }
 </script>
-</body>
-</html>
 
+<!-- ── TOMBOL INSTALL APP (PWA) ── -->
 <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(reg => console.log('SW registered:', reg.scope))
-        .catch(err => console.log('SW error:', err));
-    });
+  // Link resmi aplikasi di GitHub Pages
+  const APP_INSTALL_FALLBACK_URL = 'https://bersihbersih.github.io/aplikasi_invoice/';
+
+  let deferredInstallPrompt = null;
+  const btnInstall = document.getElementById('btn-install');
+
+  // Android/Chrome: browser memicu event ini jika PWA memenuhi syarat install
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    btnInstall.classList.remove('hidden');
+  });
+
+  // Setelah berhasil diinstall, sembunyikan tombol
+  window.addEventListener('appinstalled', () => {
+    btnInstall.classList.add('hidden');
+    deferredInstallPrompt = null;
+  });
+
+  // Jika sudah berjalan sebagai app terinstall (standalone), sembunyikan tombol
+  function isRunningStandalone() {
+    return window.matchMedia('(display-mode: standalone)').matches
+      || window.navigator.standalone === true;
   }
+
+  function handleInstallClick() {
+    if (deferredInstallPrompt) {
+      // Chrome/Android: tampilkan dialog install native
+      deferredInstallPrompt.prompt();
+      deferredInstallPrompt.userChoice.finally(() => {
+        deferredInstallPrompt = null;
+        btnInstall.classList.add('hidden');
+      });
+    } else {
+      // iOS Safari & browser lain tidak mendukung beforeinstallprompt:
+      // tampilkan instruksi manual
+      alert('Untuk install di iPhone:\n1. Buka link ini di Safari\n2. Ketuk ikon Share (□↑)\n3. Pilih "Tambahkan ke Layar Utama"\n\nUntuk Android/Chrome: pastikan Anda membuka aplikasi lewat link resminya (bukan localhost/127.0.0.1).');
+      if (APP_INSTALL_FALLBACK_URL && location.hostname !== 'bersihbersih.github.io') {
+        window.open(APP_INSTALL_FALLBACK_URL, '_blank');
+      }
+    }
+  }
+
+  // Tampilkan tombol untuk iOS Safari juga (karena tidak dapat event beforeinstallprompt)
+  document.addEventListener('DOMContentLoaded', () => {
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    if (!isRunningStandalone() && isIOS) {
+      btnInstall.classList.remove('hidden');
+    }
+  });
 </script>
 </body>
 </html>
