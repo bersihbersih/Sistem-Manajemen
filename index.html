@@ -68,7 +68,7 @@
       box-shadow: 0 2px 20px rgba(0,0,0,0.3);
     }
     .logo-img-wrap { display: flex; align-items: center; }
-    .logo-img { height: 40px; width: auto; object-fit: contain; filter: brightness(1.05); }
+    .logo-img { height: 48px; width: auto; object-fit: contain; }
     .logo-fallback { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 900; color: var(--gold-bright); display: none; }
     .header-right { display: flex; align-items: center; gap: 0.8rem; }
     .btn-install {
@@ -902,6 +902,35 @@
       header { padding: 0 14px; height: 56px; }
       .nav-tab { padding: 12px 14px; font-size: 0.78rem; }
     }
+
+    /* ── SUMBER ORDER ── */
+    .src-hint { font-size: 0.72rem; color: rgba(253,250,244,0.45); margin-top: 2px; }
+    .src-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+    .src-toolbar select { width:auto; min-width:160px; padding:8px 12px; font-size:0.85rem; }
+    .src-row { padding: 12px 0; border-bottom: 1px solid rgba(184,146,42,0.1); }
+    .src-row:last-child { border-bottom: none; }
+    .src-row.muted .src-name { color: rgba(253,250,244,0.55); font-style: italic; }
+    .src-head { display:flex; justify-content:space-between; align-items:baseline; gap:10px; margin-bottom:7px; }
+    .src-name { font-weight:600; font-size:0.9rem; color:var(--cream-light); }
+    .src-pct { font-family:'DM Mono',monospace; font-size:0.82rem; color:var(--gold-light); }
+    .src-bar { height:8px; border-radius:50px; background:rgba(255,255,255,0.08); overflow:hidden; }
+    .src-fill { height:100%; border-radius:50px; background:linear-gradient(90deg, var(--gold), var(--gold-light)); transition:width .4s ease; }
+    .src-row.muted .src-fill { background: rgba(253,250,244,0.25); }
+    .src-meta { display:flex; flex-wrap:wrap; gap:6px 18px; margin-top:7px; font-size:0.76rem; color:rgba(253,250,244,0.55); }
+    .src-meta strong { color:var(--cream-light); font-family:'DM Mono',monospace; font-weight:500; }
+    .src-alert {
+      display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+      margin-top:16px; padding:12px 14px; border-radius:10px;
+      background: var(--gold-pale); border:1px solid var(--gold-border);
+      font-size:0.82rem; color: var(--gold-light);
+    }
+    .src-alert button {
+      background: var(--gold-bright); color: var(--navy-dark); border:none; cursor:pointer;
+      font-family:'DM Sans',sans-serif; font-weight:700; font-size:0.78rem;
+      padding:7px 14px; border-radius:50px;
+    }
+    .src-select { max-width: 150px; }
+    .src-tag { display:inline-block; font-size:0.72rem; padding:2px 9px; border-radius:50px; background:var(--gold-pale); border:1px solid var(--gold-border); color:var(--gold-light); }
   </style>
 
 <!-- ══════════════════════════ LOGIN OVERLAY CSS ══════════════════════════ -->
@@ -962,6 +991,7 @@
   color: var(--gold-bright);
   line-height: 1;
 }
+.login-logo-img { width: 100%; max-width: 240px; height: auto; display: block; margin: 0 auto; }
 .login-brand .brand-sub {
   font-size: 0.75rem; letter-spacing: 3px; text-transform: uppercase;
   color: rgba(253,250,244,0.4); margin-top: 6px;
@@ -1067,6 +1097,7 @@
   gap: 20px;
 }
 .loading-logo { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 900; color: var(--gold-bright); }
+.loading-logo-img { height: 110px; width: auto; max-width: 80vw; object-fit: contain; }
 .loading-sub { font-size: 0.8rem; color: rgba(253,250,244,0.4); letter-spacing: 2px; text-transform: uppercase; }
 .loading-spinner {
   width: 36px; height: 36px;
@@ -1105,7 +1136,7 @@
 
 <!-- ══════════════════════════ APP LOADING ══════════════════════════ -->
 <div id="app-loading">
-  <div class="loading-logo">bersih<span style="color:var(--cream-light)">bersih</span></div>
+  <img src="icons/logo-panggil-bersibersih.png" alt="Panggil BersiBersih" class="loading-logo-img">
   <div class="loading-sub">Sistem Manajemen Invoice</div>
   <div class="loading-spinner"></div>
 </div>
@@ -1114,7 +1145,7 @@
 <div id="login-overlay" style="display:none;">
   <div class="login-card">
     <div class="login-brand">
-      <div class="brand-name">bersihbersih</div>
+      <img src="icons/logo-panggil-bersibersih.png" alt="Panggil BersiBersih" class="login-logo-img">
       <div class="brand-sub">Sistem Manajemen Invoice</div>
     </div>
 
@@ -1185,9 +1216,9 @@
 <!-- HEADER -->
 <header>
   <div class="logo-img-wrap">
-    <img src="icons/logo-header.png" alt="BersihBersih" class="logo-img"
+    <img src="icons/logo-panggil-bersibersih.png" alt="Panggil BersiBersih" class="logo-img"
          onerror="this.style.display='none';document.querySelector('.logo-fallback').style.display='block'">
-    <div class="logo-fallback">bersih<span style="color:var(--gold-bright)">bersih</span></div>
+    <div class="logo-fallback">Panggil <span style="color:var(--gold-bright)">bersibersih</span></div>
   </div>
   <div class="header-right-wrap">
     <button class="btn-install hidden" id="btn-install" onclick="handleInstallClick()">
@@ -1286,6 +1317,15 @@
       <div class="field full">
         <label>Alamat Layanan</label>
         <textarea id="custAddress" placeholder="Alamat lengkap lokasi yang akan dibersihkan..."></textarea>
+      </div>
+      <div class="field">
+        <label>Sumber Order</label>
+        <select id="orderSource"></select>
+        <div class="src-hint">Dari mana pelanggan ini tahu BersihBersih? (untuk analisis marketing)</div>
+      </div>
+      <div class="field">
+        <label>Detail Sumber (opsional)</label>
+        <input type="text" id="orderSourceDetail" placeholder="Mis. nama influencer / nama pereferensi" />
       </div>
     </div>
   </div>
@@ -1498,6 +1538,20 @@
     <div class="bar-chart" id="bar-chart"></div>
   </div>
 
+  <!-- Sumber Order -->
+  <div class="card">
+    <div class="card-title">Sumber Order</div>
+    <div class="src-toolbar">
+      <select id="src-period" onchange="renderSourceStats()">
+        <option value="all">Semua Waktu</option>
+        <option value="month">Bulan Ini</option>
+        <option value="3m">3 Bulan Terakhir</option>
+      </select>
+      <span style="font-size:0.74rem;color:rgba(253,250,244,0.45);">Omzet dihitung dari invoice berstatus Lunas</span>
+    </div>
+    <div id="source-stats"></div>
+  </div>
+
   <!-- Top Customers -->
   <div class="card">
     <div class="card-title">Pelanggan Teratas (Bulan Ini)</div>
@@ -1542,6 +1596,7 @@
       <select id="hist-month" onchange="renderHistory()">
         <option value="">Semua Bulan</option>
       </select>
+      <select id="hist-source" onchange="renderHistory()"></select>
     </div>
 
     <div class="history-table-wrap">
@@ -1549,6 +1604,7 @@
         <thead><tr>
           <th>No. Invoice</th>
           <th>Pelanggan</th>
+          <th>Sumber</th>
           <th>Tanggal</th>
           <th>Jatuh Tempo</th>
           <th style="text-align:right">Total</th>
@@ -2175,6 +2231,7 @@ function initInvoiceApp() {
   updateBadges();
   populateMonthFilter();
   populateCFMonthFilter();
+  initSourceSelects();
   renderCustomerSuggestions();
   cfItems = [];
   renderCFItems();
@@ -2377,6 +2434,11 @@ function fillCustomer(custId) {
   document.getElementById('custName').value = c.name;
   document.getElementById('custWA').value = c.wa || '';
   document.getElementById('custAddress').value = c.address || '';
+  // Pelanggan yang sudah pernah order → sumber otomatis "Pelanggan Lama"
+  if ((c.orderCount || 0) > 0) {
+    document.getElementById('orderSource').value = 'repeat';
+    document.getElementById('orderSourceDetail').value = c.source ? 'Awal dari: ' + sourceLabel(c.source) : '';
+  }
   showToast('✦ Data pelanggan diisi otomatis');
 }
 
@@ -2390,6 +2452,8 @@ function generatePreview() {
   const custAddr = document.getElementById('custAddress').value;
   const noteC = document.getElementById('noteCustomer').value;
   const noteT = document.getElementById('noteTerms').value;
+  const orderSource = document.getElementById('orderSource').value;
+  const orderSourceDetail = document.getElementById('orderSourceDetail').value.trim();
 
   const fmtDate = (s) => {
     if (!s) return '—';
@@ -2444,14 +2508,14 @@ function generatePreview() {
   setTimeout(() => sec.scrollIntoView({ behavior:'smooth', block:'start' }), 100);
 
   // ── AUTO SAVE ORDER ──
-  saveOrderToHistory({ num, dateVal, dueVal, custName, custWA, custAddr, items: JSON.parse(JSON.stringify(items)), subtotal, disc, discPct, tax, taxPct, extra, total, noteC, noteT });
+  saveOrderToHistory({ num, dateVal, dueVal, custName, custWA, custAddr, items: JSON.parse(JSON.stringify(items)), subtotal, disc, discPct, tax, taxPct, extra, total, noteC, noteT, source: orderSource, sourceDetail: orderSourceDetail });
 
   // ── AUTO SAVE / UPDATE CUSTOMER ──
   if (custName && custName !== 'Pelanggan') {
-    upsertCustomer({ name: custName, wa: custWA, address: custAddr });
+    upsertCustomer({ name: custName, wa: custWA, address: custAddr, source: orderSource });
   }
 
-  showToast('✦ Invoice dibuat & tersimpan di riwayat!');
+  showToast(orderSource ? '✦ Invoice dibuat & tersimpan di riwayat!' : '✦ Invoice tersimpan — sumber order belum diisi');
 }
 
 // ── Save order to history
@@ -2471,7 +2535,7 @@ function saveOrderToHistory(order) {
 }
 
 // ── Upsert customer
-function upsertCustomer({ name, wa, address }) {
+function upsertCustomer({ name, wa, address, source }) {
   const custs = loadCustomers();
   const existing = custs.find(c => c.name.toLowerCase() === name.toLowerCase());
   if (existing) {
@@ -2479,6 +2543,7 @@ function upsertCustomer({ name, wa, address }) {
     existing.address = address || existing.address;
     existing.orderCount = (existing.orderCount || 0) + 1;
     existing.lastOrder = new Date().toISOString();
+    if (!existing.source && source && source !== 'repeat') existing.source = source;
   } else {
     custs.unshift({
       id: 'C' + Date.now(),
@@ -2487,6 +2552,7 @@ function upsertCustomer({ name, wa, address }) {
       totalSpent: 0,
       lastOrder: new Date().toISOString(),
       note: '',
+      source: (source && source !== 'repeat') ? source : '',
     });
   }
   saveCustomers(custs);
@@ -2587,6 +2653,8 @@ function resetForm() {
   document.getElementById('custName').value = '';
   document.getElementById('custWA').value = '';
   document.getElementById('custAddress').value = '';
+  document.getElementById('orderSource').value = '';
+  document.getElementById('orderSourceDetail').value = '';
   document.getElementById('discountPct').value = '';
   document.getElementById('taxPct').value = '';
   document.getElementById('extraFee').value = '';
@@ -2631,6 +2699,7 @@ function renderDashboard() {
   document.getElementById('stat-pending-count').textContent = `${pendingOrders.length} invoice`;
 
   renderChart();
+  renderSourceStats();
   renderTopCustomers(monthOrders);
   renderRecentOrders(orders.slice(0, 5));
 }
@@ -2721,6 +2790,123 @@ function renderRecentOrders(recent) {
 }
 
 // ══════════════════════════════════
+//   SUMBER ORDER
+// ══════════════════════════════════
+const ORDER_SOURCES = [
+  { v: 'sanci',       label: 'Sanci Indonesia',          icon: '🪑' },
+  { v: 'influencer',  label: 'Influencer (barter)',      icon: '🌟' },
+  { v: 'google-maps', label: 'Google Maps',              icon: '📍' },
+  { v: 'instagram',   label: 'Instagram',                icon: '📸' },
+  { v: 'threads',     label: 'Threads',                  icon: '🧵' },
+  { v: 'referral',    label: 'Referral / Rekomendasi',   icon: '🤝' },
+  { v: 'repeat',      label: 'Pelanggan Lama (Repeat)',  icon: '🔁' },
+  { v: 'whatsapp',    label: 'WhatsApp / Langsung',      icon: '💬' },
+  { v: 'lainnya',     label: 'Lainnya',                  icon: '✨' },
+];
+
+function sourceLabel(v) {
+  const s = ORDER_SOURCES.find(x => x.v === v);
+  return s ? `${s.icon} ${s.label}` : 'Belum diisi';
+}
+
+function sourceOptionsHTML(selected, withBlank) {
+  const blank = withBlank ? `<option value="" ${!selected ? 'selected' : ''}>— Belum diisi —</option>` : '';
+  return blank + ORDER_SOURCES.map(s =>
+    `<option value="${s.v}" ${selected === s.v ? 'selected' : ''}>${s.icon} ${s.label}</option>`
+  ).join('');
+}
+
+function initSourceSelects() {
+  const form = document.getElementById('orderSource');
+  form.innerHTML = '<option value="">— Pilih sumber order —</option>' + sourceOptionsHTML('', false);
+  const filter = document.getElementById('hist-source');
+  filter.innerHTML = '<option value="">Semua Sumber</option><option value="__none">Belum diisi</option>' + sourceOptionsHTML('', false);
+}
+
+function updateOrderSource(orderId, newSource) {
+  const orders = loadOrders();
+  const o = orders.find(x => x.id === orderId);
+  if (!o) return;
+  o.source = newSource;
+  saveOrders(orders);
+  // Isi sumber awal pelanggan jika masih kosong (kecuali "repeat")
+  if (newSource && newSource !== 'repeat') {
+    const custs = loadCustomers();
+    const c = custs.find(x => x.name === o.custName);
+    if (c && !c.source) { c.source = newSource; saveCustomers(custs); }
+  }
+  showToast(newSource ? `Sumber order: ${sourceLabel(newSource)}` : 'Sumber order dikosongkan');
+}
+
+function goFillSources() {
+  switchTab('history');
+  document.getElementById('hist-source').value = '__none';
+  renderHistory();
+}
+
+function renderSourceStats() {
+  const el = document.getElementById('source-stats');
+  if (!el) return;
+  const period = document.getElementById('src-period').value;
+  const now = new Date();
+  let orders = loadOrders().filter(o => o.status !== 'batal');
+
+  if (period !== 'all') {
+    const from = period === 'month'
+      ? new Date(now.getFullYear(), now.getMonth(), 1)
+      : new Date(now.getFullYear(), now.getMonth() - 2, 1);
+    orders = orders.filter(o => o.dateVal && new Date(o.dateVal) >= from);
+  }
+
+  if (orders.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">🎯</div><p>Belum ada data pada periode ini</p></div>';
+    return;
+  }
+
+  const map = {};
+  orders.forEach(o => {
+    const k = o.source || '';
+    if (!map[k]) map[k] = { key: k, count: 0, revenue: 0 };
+    map[k].count++;
+    if (o.status === 'lunas') map[k].revenue += o.total || 0;
+  });
+
+  const total = orders.length;
+  const rows = Object.values(map).sort((a, b) => {
+    if (!a.key) return 1;
+    if (!b.key) return -1;
+    return b.revenue - a.revenue || b.count - a.count;
+  });
+
+  el.innerHTML = rows.map(r => {
+    const pct = Math.round(r.count / total * 100);
+    const avg = r.count ? r.revenue / r.count : 0;
+    return `
+      <div class="src-row ${r.key ? '' : 'muted'}">
+        <div class="src-head">
+          <span class="src-name">${sourceLabel(r.key)}</span>
+          <span class="src-pct">${pct}%</span>
+        </div>
+        <div class="src-bar"><div class="src-fill" style="width:${pct}%"></div></div>
+        <div class="src-meta">
+          <span><strong>${r.count}</strong> order</span>
+          <span>Omzet <strong>${formatRp(r.revenue)}</strong></span>
+          <span>Rata-rata <strong>${formatRp(Math.round(avg))}</strong></span>
+        </div>
+      </div>`;
+  }).join('');
+
+  const unfilled = map[''] ? map[''].count : 0;
+  if (unfilled > 0) {
+    el.innerHTML += `
+      <div class="src-alert">
+        <span>⚠️ ${unfilled} invoice belum punya sumber order, sehingga analisis belum akurat.</span>
+        <button onclick="goFillSources()">Lengkapi sekarang</button>
+      </div>`;
+  }
+}
+
+// ══════════════════════════════════
 //   HISTORY PAGE
 // ══════════════════════════════════
 function populateMonthFilter() {
@@ -2745,13 +2931,15 @@ function renderHistory() {
   let filtered = orders.filter(o => {
     const matchSearch = !search || (o.custName||'').toLowerCase().includes(search) || (o.num||'').toLowerCase().includes(search);
     const matchStatus = !status || o.status === status;
+    const srcFilter = document.getElementById('hist-source').value;
+    const matchSource = !srcFilter || (srcFilter === '__none' ? !o.source : o.source === srcFilter);
     let matchMonth = true;
     if (month && o.dateVal) {
       matchMonth = o.dateVal.startsWith(month);
     } else if (month && !o.dateVal) {
       matchMonth = false;
     }
-    return matchSearch && matchStatus && matchMonth;
+    return matchSearch && matchStatus && matchMonth && matchSource;
   });
 
   const tbody = document.getElementById('history-body');
@@ -2770,6 +2958,7 @@ function renderHistory() {
     <tr>
       <td class="mono">${o.num}</td>
       <td style="font-weight:500;">${o.custName || '—'}</td>
+      <td><select class="status-select src-select" onchange="updateOrderSource('${o.id}', this.value)">${sourceOptionsHTML(o.source, true)}</select></td>
       <td>${o.dateVal ? new Date(o.dateVal).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'}) : '—'}</td>
       <td>${o.dueVal ? new Date(o.dueVal).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'}) : '—'}</td>
       <td class="mono" style="text-align:right;">${formatRp(o.total || 0)}</td>
@@ -2827,6 +3016,7 @@ function showOrderDetail(orderId) {
       <div><div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--gold);margin-bottom:4px;">Status</div><span class="status-badge status-${o.status}">${statusLabel(o.status)}</span></div>
       <div><div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--gold);margin-bottom:4px;">Tanggal</div>${fmtDate(o.dateVal)}</div>
       <div><div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--gold);margin-bottom:4px;">Jatuh Tempo</div>${fmtDate(o.dueVal)}</div>
+      <div style="grid-column:1/-1;"><div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--gold);margin-bottom:4px;">Sumber Order</div>${sourceLabel(o.source)}${o.sourceDetail ? ' · ' + o.sourceDetail : ''}</div>
     </div>
     <div style="margin-bottom:14px;padding:12px 14px;background:rgba(255,255,255,0.04);border-radius:10px;border:1px solid rgba(184,146,42,0.15);">
       <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--gold);margin-bottom:6px;">Pelanggan</div>
@@ -2894,6 +3084,7 @@ function renderCustomers() {
         <div class="cust-meta">
           ${c.wa ? `📱 ${c.wa}<br>` : ''}
           ${c.address ? `📍 ${c.address.substring(0,60)}${c.address.length>60?'…':''}<br>` : ''}
+          ${c.source ? `🎯 Sumber awal: ${sourceLabel(c.source)}<br>` : ''}
           ${c.note ? `📝 ${c.note}` : ''}
         </div>
         <div class="cust-stats">

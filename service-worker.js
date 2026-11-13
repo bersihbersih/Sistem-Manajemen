@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bersihbersih-v3';
+const CACHE_NAME = 'bersihbersih-v6';
 
 const ASSETS = [
   './index.html',
