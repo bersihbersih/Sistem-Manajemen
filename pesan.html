@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Pesan Layanan · Panggil BersiBersih</title>
+<meta name="theme-color" content="#1C2D5A" />
+<link rel="icon" type="image/png" href="icons/favicon-32.png" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --navy: #1C2D5A; --navy-dark: #111e3d; --navy-card: #223468;
+    --gold: #B8922A; --gold-bright: #D4A93A; --gold-light: #E8C766;
+    --cream: #FDFAF4; --green: #3ecf8e; --red: #ef6b6b; --amber: #f0b429;
+    --line: rgba(184,146,42,0.28);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif; color: var(--cream);
+    background: radial-gradient(1200px 600px at 50% -10%, #2a4080 0%, var(--navy) 45%, var(--navy-dark) 100%) fixed;
+    min-height: 100vh; line-height: 1.5;
+  }
+  header { text-align: center; padding: 30px 16px 8px; }
+  header img { height: 78px; width: auto; max-width: 80%; object-fit: contain; }
+  header p { margin-top: 10px; color: rgba(253,250,244,0.7); font-size: 0.92rem; }
+  main { max-width: 640px; margin: 0 auto; padding: 14px 14px 80px; }
+  .card {
+    background: var(--navy-card); border: 1px solid var(--line); border-radius: 18px;
+    padding: 22px 20px; margin-top: 16px; box-shadow: 0 6px 28px rgba(0,0,0,0.28);
+  }
+  .step { display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+    font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; }
+  .step .n { width: 26px; height: 26px; border-radius: 50%; background: var(--gold-bright); color: var(--navy-dark);
+    font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 800; display: grid; place-items: center; flex: none; }
+  label { display: block; font-size: 0.72rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--gold-bright); margin-bottom: 6px; }
+  .field { margin-bottom: 14px; }
+  .req::after { content: ' *'; color: var(--red); }
+  input, select, textarea {
+    width: 100%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14);
+    color: var(--cream); border-radius: 10px; padding: 12px 14px; font: inherit; font-size: 0.95rem; outline: none;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--gold-bright); background: rgba(255,255,255,0.12); }
+  select option { color: #111; }
+  textarea { resize: vertical; min-height: 78px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 520px) { .row { grid-template-columns: 1fr; } }
+  .hint { font-size: 0.76rem; color: rgba(253,250,244,0.55); margin-top: 5px; }
+
+  /* kalender */
+  .cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .cal-head b { font-size: 1rem; }
+  .cal-nav { background: rgba(255,255,255,0.1); border: 1px solid var(--line); color: var(--cream);
+    width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-size: 1rem; }
+  .cal-nav:disabled { opacity: .3; cursor: default; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+  .cal-dow { text-align: center; font-size: 0.68rem; color: rgba(253,250,244,0.5); font-weight: 700; padding: 4px 0; }
+  .day { aspect-ratio: 1; border-radius: 10px; border: 1px solid transparent; background: rgba(255,255,255,0.05);
+    color: var(--cream); font: inherit; font-size: 0.88rem; font-weight: 600; cursor: pointer; position: relative; }
+  .day.empty { visibility: hidden; }
+  .day.ok  { background: rgba(62,207,142,0.16); border-color: rgba(62,207,142,0.45); }
+  .day.few { background: rgba(240,180,41,0.16); border-color: rgba(240,180,41,0.5); }
+  .day.full { background: rgba(239,107,107,0.14); border-color: rgba(239,107,107,0.35); color: rgba(253,250,244,0.45); cursor: not-allowed; }
+  .day.off { background: transparent; color: rgba(253,250,244,0.25); cursor: not-allowed; }
+  .day.sel { outline: 2px solid var(--gold-bright); background: var(--gold-bright); color: var(--navy-dark); border-color: var(--gold-bright); }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 12px; font-size: 0.74rem; color: rgba(253,250,244,0.65); }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+  .slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 16px; }
+  .slot { padding: 12px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,0.06);
+    color: var(--cream); text-align: left; cursor: pointer; font: inherit; }
+  .slot b { display: block; font-size: 1.05rem; }
+  .slot small { font-size: 0.74rem; color: var(--green); }
+  .slot.few small { color: var(--amber); }
+  .slot.full { opacity: .45; cursor: not-allowed; }
+  .slot.full small { color: var(--red); }
+  .slot.sel { background: var(--gold-bright); color: var(--navy-dark); border-color: var(--gold-bright); }
+  .slot.sel small { color: var(--navy-dark); }
+  .picked { margin-top: 14px; padding: 10px 14px; border-radius: 10px; background: rgba(212,169,58,0.14);
+    border: 1px solid var(--line); font-size: 0.88rem; display: none; }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
+    border: none; border-radius: 50px; padding: 15px 22px; font: inherit; font-weight: 700; font-size: 1rem; cursor: pointer;
+    background: linear-gradient(135deg, var(--gold-bright), var(--gold)); color: var(--navy-dark); }
+  .btn:disabled { opacity: .55; cursor: wait; }
+  .btn.ghost { background: rgba(255,255,255,0.1); color: var(--cream); border: 1px solid var(--line); }
+  .btn.sm { width: auto; padding: 10px 16px; font-size: 0.85rem; }
+  .loc-ok { margin-top: 8px; font-size: 0.82rem; color: var(--green); display: none; }
+  .loc-ok a { color: var(--gold-light); }
+  .hp { position: absolute; left: -9999px; height: 0; overflow: hidden; }
+  .msg { display: none; margin-top: 12px; padding: 12px 14px; border-radius: 10px; font-size: 0.88rem; }
+  .msg.err { display: block; background: rgba(239,107,107,0.14); border: 1px solid rgba(239,107,107,0.5); }
+  .done { text-align: center; padding: 10px 4px; }
+  .done .tick { width: 64px; height: 64px; margin: 4px auto 14px; border-radius: 50%; background: rgba(62,207,142,0.18);
+    border: 2px solid var(--green); color: var(--green); font-size: 2rem; display: grid; place-items: center; }
+  .done h2 { font-family: 'Playfair Display', serif; margin-bottom: 6px; }
+  .code { display: inline-block; margin: 12px 0; padding: 8px 18px; border-radius: 10px; border: 1px dashed var(--gold-bright);
+    font-family: ui-monospace, monospace; font-size: 1.2rem; letter-spacing: 2px; color: var(--gold-light); }
+  .sum { text-align: left; margin: 14px 0; font-size: 0.9rem; }
+  .sum div { display: flex; justify-content: space-between; gap: 14px; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .sum span:first-child { color: rgba(253,250,244,0.6); flex: none; }
+  .sum span:last-child { text-align: right; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { padding: 9px 16px; border-radius: 50px; border: 1px solid var(--line); background: rgba(255,255,255,0.07);
+    color: var(--cream); font: inherit; font-size: 0.88rem; font-weight: 600; cursor: pointer; }
+  .chip.sel { background: var(--gold-bright); color: var(--navy-dark); border-color: var(--gold-bright); }
+  .cartrow { display: grid; grid-template-columns: 1fr auto; gap: 6px 10px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; }
+  .cartrow .nm small { display: block; color: rgba(253,250,244,0.55); font-size: 0.74rem; }
+  .cartrow .ctl { display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
+  .cartrow input { width: 76px; padding: 7px 8px; text-align: center; }
+  .cartrow .x { background: none; border: none; color: var(--red); font-size: 1.2rem; cursor: pointer; padding: 0 6px; }
+  .cartrow .lt { grid-column: 1 / -1; text-align: right; color: var(--gold-light); font-weight: 700; }
+  .sumbox { margin-top: 14px; font-size: 0.88rem; }
+  .sumbox .r { display: flex; justify-content: space-between; gap: 12px; padding: 5px 0; }
+  .sumbox .r.tot { border-top: 1px solid var(--line); margin-top: 6px; padding-top: 10px; font-size: 1.05rem; font-weight: 800; color: var(--gold-light); }
+  .sumbox .r.dis { color: var(--green); }
+  .sumbox .note { color: rgba(253,250,244,0.55); font-size: 0.76rem; margin-top: 6px; }
+  .msg.info { display: none; background: rgba(212,169,58,0.12); border: 1px solid var(--line); }
+  .msg.warn { display: block; background: rgba(240,180,41,0.12); border: 1px solid rgba(240,180,41,0.5); }
+  footer { text-align: center; font-size: 0.76rem; color: rgba(253,250,244,0.45); padding: 10px 16px 30px; }
+</style>
+</head>
+<body>
+<header>
+  <img src="icons/logo-panggil-bersibersih.png" alt="Panggil BersiBersih" />
+  <p>Pilih layanan, pilih staf, lalu booking jadwal yang kosong sendiri. Operasional setiap hari 08.00–17.00 WIB.</p>
+</header>
+
+<main id="formWrap">
+  <div class="card">
+    <div class="step"><span class="n">1</span> Pilih Layanan</div>
+    <div class="row">
+      <div class="field"><label for="cat">Kategori</label><select id="cat"></select></div>
+      <div class="field"><label for="item">Layanan</label><select id="item"></select></div>
+    </div>
+    <div class="row" style="align-items:end">
+      <div class="field"><label for="qty" id="qtyLabel">Jumlah</label><input id="qty" type="number" inputmode="decimal" min="1" step="1" value="1" /></div>
+      <div class="field"><button class="btn sm" id="btnAdd" type="button" style="width:100%">+ Tambah ke pesanan</button></div>
+    </div>
+    <div class="hint" id="itemNote"></div>
+    <div id="cart"></div>
+  </div>
+
+  <div class="card">
+    <div class="step"><span class="n">2</span> Pilih Staf Cleaner</div>
+    <div class="chips" id="staffChips"></div>
+    <div class="hint">Anda bisa memilih lebih dari satu. Untuk layanan per jam, harga dihitung per cleaner. Untuk layanan per item, makin banyak cleaner makin singkat durasinya.</div>
+    <div class="sumbox" id="summary"></div>
+  </div>
+
+  <div class="card">
+    <div class="step"><span class="n">3</span> Pilih Tanggal &amp; Jam Mulai</div>
+    <div class="msg info" id="gate"></div>
+    <div id="calWrap">
+    <div class="cal-head">
+      <button class="cal-nav" id="prevM" type="button" aria-label="Bulan sebelumnya">‹</button>
+      <b id="monthLabel">…</b>
+      <button class="cal-nav" id="nextM" type="button" aria-label="Bulan berikutnya">›</button>
+    </div>
+    <div class="cal-grid" id="dow"></div>
+    <div class="cal-grid" id="cal" style="margin-top:5px"></div>
+    <div class="legend">
+      <span><i style="background:rgba(62,207,142,.6)"></i>Tersedia</span>
+      <span><i style="background:rgba(240,180,41,.7)"></i>Hampir penuh</span>
+      <span><i style="background:rgba(239,107,107,.6)"></i>Penuh</span>
+      <span><i style="background:rgba(255,255,255,.2)"></i>Tidak tersedia</span>
+    </div>
+    <div class="msg" id="calMsg"></div>
+    <div class="slots" id="slots"></div>
+    <div class="picked" id="picked"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="step"><span class="n">4</span> Data &amp; Lokasi</div>
+    <div class="row">
+      <div class="field"><label class="req" for="name">Nama</label><input id="name" autocomplete="name" maxlength="80" placeholder="Nama lengkap" /></div>
+      <div class="field"><label class="req" for="wa">No. WhatsApp</label><input id="wa" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="08xxxxxxxxxx" /></div>
+    </div>
+    <div class="field">
+      <label class="req" for="address">Alamat lengkap</label>
+      <textarea id="address" maxlength="400" placeholder="Nama jalan, cluster / apartemen, tower, lantai, nomor unit"></textarea>
+    </div>
+    <div class="field">
+      <label for="landmark">Patokan (opsional)</label>
+      <input id="landmark" maxlength="120" placeholder="Mis. depan pos satpam, sebelah minimarket" />
+    </div>
+    <div class="field">
+      <label>Titik lokasi di Google Maps (opsional)</label>
+      <button class="btn ghost sm" id="btnLoc" type="button">📍 Gunakan lokasi saya sekarang</button>
+      <div class="loc-ok" id="locOk"></div>
+      <input id="mapsUrl" maxlength="300" style="margin-top:10px" placeholder="atau tempel link Google Maps di sini" />
+      <div class="hint">Titik lokasi membantu tim menemukan alamat Anda lebih cepat.</div>
+    </div>
+    <div class="field">
+      <label for="notes">Catatan tambahan (opsional)</label>
+      <textarea id="notes" maxlength="500" placeholder="Kondisi area, ukuran, hewan peliharaan, akses masuk, dll."></textarea>
+    </div>
+    <div class="field">
+      <label for="source">Dari mana Anda tahu kami? (opsional)</label>
+      <select id="source">
+        <option value="">— Pilih —</option>
+        <option value="instagram">Instagram</option>
+        <option value="threads">Threads</option>
+        <option value="google-maps">Google Maps / pencarian Google</option>
+        <option value="influencer">Rekomendasi influencer</option>
+        <option value="sanci">Sanci Indonesia</option>
+        <option value="referral">Teman / keluarga</option>
+        <option value="repeat">Saya pelanggan lama</option>
+        <option value="lainnya">Lainnya</option>
+      </select>
+    </div>
+    <div class="hp"><label>Jangan diisi</label><input id="website" tabindex="-1" autocomplete="off" /></div>
+    <div class="msg" id="formMsg"></div>
+    <button class="btn" id="btnSubmit" type="button" style="margin-top:6px">Kirim Pesanan</button>
+    <div class="hint" style="text-align:center;margin-top:10px">Jadwal langsung terkunci begitu pesanan terkirim. Harga di atas adalah estimasi; tim kami akan mengonfirmasi detail dan harga final via WhatsApp.</div>
+  </div>
+</main>
+
+<main id="doneWrap" style="display:none">
+  <div class="card done">
+    <div class="tick">✓</div>
+    <h2>Pesanan Terkirim!</h2>
+    <p style="color:rgba(253,250,244,.7)">Jadwal Anda sudah terkunci. Simpan kode booking ini:</p>
+    <div class="code" id="doneCode">—</div>
+    <div class="sum" id="doneSum"></div>
+    <a class="btn" id="doneWA" target="_blank" rel="noopener">💬 Konfirmasi via WhatsApp</a>
+    <button class="btn ghost" style="margin-top:10px" onclick="location.reload()">Buat pesanan lain</button>
+  </div>
+</main>
+
+<footer>© 2026 Panggil BersiBersih · Revined Clean | Elevated Living</footer>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, collection, doc, getDoc, getDocs, query, where, writeBatch, serverTimestamp }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyB4SmqSXlGf1wrNsEDLZ1xtzCf5PmMFsbA",
+  authDomain: "bersihbersih-app.firebaseapp.com",
+  projectId: "bersihbersih-app",
+  storageBucket: "bersihbersih-app.firebasestorage.app",
+  messagingSenderId: "1055170371893",
+  appId: "1:1055170371893:web:1595498ed15d014ed66c7c"
+};
+const ADMIN_WA = '6282123181255';
+
+const db = getFirestore(initializeApp(FIREBASE_CONFIG));
+const $ = id => document.getElementById(id);
+
+// ── KATALOG HARGA (sumber: pricelist BersihBersih). Ubah harga / durasi di sini.
+// h = jam kerja per 1 satuan per 1 cleaner (estimasi untuk menghitung durasi). hr = harga per jam per cleaner.
+const I = (n, p, u, h, o = {}) => ({ n, p, u, h, ...o });
+const H = (n, p) => ({ n, p, u: 'jam', hr: 1 });
+const CATALOG = [
+ { n: 'Home Cleaning', t: 20000, min: 250000, free: false, items: [
+   H('Daily Cleaning (per jam / cleaner)', 100000), H('General Cleaning (per jam / cleaner)', 130000), H('Deep Cleaning (per jam / cleaner)', 170000),
+   I('Paket General 6 jam • 3 cleaner', 1500000, 'paket', 18), I('Paket General 3 jam • 2 cleaner', 850000, 'paket', 6),
+   I('Paket Daily 3 jam • 1 cleaner', 300000, 'paket', 3), I('Paket Daily 5 jam • 2 cleaner', 700000, 'paket', 10), I('Paket Daily 5 jam • 3 cleaner', 1000000, 'paket', 15),
+   I('Post Renovation Cleaning', 22000, 'm²', 0.1, { min: 80, tiers: [[80, 22000], [100, 20000], [201, 18500]], note: '80–99 m² Rp22.000 · 100–200 m² Rp20.000 · di atas 200 m² Rp18.500 per m²' }) ] },
+ { n: 'Apartment', t: 20000, min: 250000, free: false, items: [
+   I('Daily Cleaning 1 BR', 250000, 'unit', 3), I('Daily Cleaning 2 BR', 350000, 'unit', 4), I('Daily Cleaning 3 BR', 500000, 'unit', 5),
+   I('General Cleaning 1 BR', 350000, 'unit', 4), I('General Cleaning 2 BR', 500000, 'unit', 5), I('General Cleaning 3 BR', 700000, 'unit', 6),
+   I('Deep Cleaning 3 jam • 1 cleaner', 749000, 'paket', 3), I('Deep Cleaning 5 jam • 2 cleaner', 1199000, 'paket', 10), I('Deep Cleaning 6 jam • 3 cleaner', 2199000, 'paket', 18) ] },
+ { n: 'Kost', t: 30000, min: 200000, free: true, items: [
+   I('Daily Cleaning kamar kost + toilet dalam', 200000, 'kamar', 3), I('Daily Cleaning kamar kost tanpa toilet', 180000, 'kamar', 3),
+   I('General Cleaning kamar kost + toilet dalam', 350000, 'kamar', 4), I('General Cleaning kamar kost tanpa toilet', 250000, 'kamar', 3) ] },
+ { n: 'Cuci Kasur', t: 30000, min: 200000, free: true, items: [
+   I('Kasur 220×220', 260000, 'pcs', 1.5), I('Kasur 200×200', 220000, 'pcs', 1.5), I('Kasur 180×200', 180000, 'pcs', 1.5), I('Kasur 160×200', 160000, 'pcs', 1.5),
+   I('Kasur 140×200', 150000, 'pcs', 1), I('Kasur 120×200', 140000, 'pcs', 1), I('Kasur 90×200', 130000, 'pcs', 1), I('Bantal / Guling', 25000, 'pcs', 0.1) ] },
+ { n: 'Cuci Sofa & Kursi', t: 30000, min: 200000, free: true, items: [
+   I('Sofa Standar', 45000, 'seater', 0.4), I('Sofa Jumbo', 50000, 'seater', 0.4), I('Sofa Recliner', 70000, 'seater', 0.5), I('Sofa Kulit', 70000, 'seater', 0.5),
+   I('Sofa Bed', 75000, 'seater', 0.5), I('Kursi Makan', 25000, 'pcs', 0.15), I('Kursi Kantor', 25000, 'pcs', 0.15) ] },
+ { n: 'Sedot Tungau', t: 30000, min: 200000, free: true, items: [
+   I('Kasur Superking 200×200 (gratis 4 bantal/guling)', 200000, 'pcs', 1), I('Kasur Kingsize 180×200 (gratis 4 bantal/guling)', 180000, 'pcs', 1),
+   I('Kasur Queensize 160×200 (gratis 4 bantal/guling)', 160000, 'pcs', 1), I('Kasur Doublesize 120×200 (gratis 4 bantal/guling)', 140000, 'pcs', 1),
+   I('Kasur Singlesize 90×200 (gratis 4 bantal/guling)', 130000, 'pcs', 1), I('Headboard & Divan', 50000, 'pcs', 0.5),
+   I('Bed Cover Superking', 100000, 'pcs', 0.5), I('Bed Cover Kingsize', 90000, 'pcs', 0.5), I('Bed Cover Queensize', 70000, 'pcs', 0.5),
+   I('Bed Cover Doublesize', 60000, 'pcs', 0.4), I('Bed Cover Singlesize', 50000, 'pcs', 0.4),
+   I('Sofa Standar', 35000, 'seater', 0.3), I('Sofa Jumbo', 40000, 'seater', 0.3), I('Sofa Bed 2 Seater', 150000, 'pcs', 0.8), I('Sofa Bed 3 Seater', 170000, 'pcs', 1),
+   I('Jok Mobil', 40000, 'pcs', 0.3), I('Jok Bus', 20000, 'pcs', 0.2), I('Kursi Makan', 25000, 'pcs', 0.15), I('Kursi Kantor Standar', 20000, 'pcs', 0.15),
+   I('Kursi Kantor Jumbo', 25000, 'pcs', 0.15), I('Kursi Santai', 50000, 'pcs', 0.3), I('Bean Bag', 50000, 'pcs', 0.3),
+   I('Stroller', 50000, 'pcs', 0.4), I('Baby Crib', 70000, 'pcs', 0.5), I('Bouncer / Ayunan', 50000, 'pcs', 0.4), I('High Chair', 50000, 'pcs', 0.4),
+   I('Car Seat', 50000, 'pcs', 0.4), I('Matras Baby', 50000, 'pcs', 0.4), I('Boneka', 20000, 'pcs', 0.15),
+   I('Paket Small Bedroom (< 10 m²)', 350000, 'paket', 1.5), I('Paket Large Bedroom (> 11 m²)', 500000, 'paket', 2.5), I('Paket House (< 5 jam)', 1000000, 'paket', 5),
+   I('Wallpaper', 10000, 'm²', 0.05), I('Air Purifier (15 menit)', 40000, 'ruangan', 0.25), I('Karpet', 10000, 'm²', 0.05), I('Lantai', 10000, 'm²', 0.05),
+   I('Extra Pillow / Guling', 5000, 'pcs', 0.1), I('Gordyn + Vitrage', 20000, 'm²', 0.05), I('Obat Anti Kutu Kasur', 50000, 'pcs', 0.25) ] },
+ { n: 'Karpet', t: 30000, min: 200000, free: true, items: [
+   I('Karpet Kantor', 15000, 'm²', 0.05, { min: 100 }), I('Karpet Permadani', 30000, 'm²', 0.1, { min: 10 }),
+   I('Karpet Rumah Ibadah', 10000, 'm²', 0.05, { min: 60 }), I('Karpet Gulung / Rumah', 20000, 'm²', 0.08) ] },
+ { n: 'Gordyn', t: 30000, min: 200000, free: true, items: [
+   I('Gordyn Tipis', 15000, 'm²', 0.05, { min: 50 }), I('Gordyn Tebal', 20000, 'm²', 0.06, { min: 50 }), I('Vitrase', 10000, 'm²', 0.04, { min: 50 }),
+   I('Vertical Blind', 10000, 'm²', 0.05, { min: 50 }), I('Roller Blind', 25000, 'm²', 0.07, { min: 30 }) ] },
+ { n: 'Car Interior', t: 30000, min: 200000, free: true, items: [
+   I('Jok Mobil', 50000, 'seater', 0.5), I('Door Trim', 25000, 'pcs', 0.25), I('Seat Belt', 15000, 'pcs', 0.15), I('Plafon', 60000, 'baris', 1), I('Karpet Mobil', 50000, 'baris', 0.75) ] },
+ { n: 'Toilet', t: 20000, min: 350000, free: false, items: [
+   I('Salon Toilet', 100000, 'm²', 0.5), I('Showerglass (per bidang)', 180000, 'bidang', 0.5), I('Bathub', 150000, 'pcs', 0.75),
+   I('Urinoir / Kloset (satuan)', 100000, 'pcs', 0.15, { min: 3, tiers: [[3, 100000], [10, 50000], [20, 40000]], note: '3–9 pcs Rp100.000 · 10–19 pcs Rp50.000 · 20+ pcs Rp40.000 per pcs' }),
+   I('Wastafel (satuan)', 95000, 'pcs', 0.15, { min: 3, tiers: [[3, 95000], [10, 45000], [20, 35000]], note: '3–9 pcs Rp95.000 · 10–19 pcs Rp45.000 · 20+ pcs Rp35.000 per pcs' }),
+   I('Lantai toilet (satuan)', 50000, 'm²', 0.1), I('Bathtub (satuan)', 250000, 'pcs', 0.75), I('Showerglass (satuan)', 400000, 'pcs', 0.5) ] },
+ { n: 'Baby Care', t: 20000, min: 250000, free: false, items: [
+   I('Stroller', 150000, 'pcs', 0.5), I('Stroller Twins', 250000, 'pcs', 0.75), I('Baby Crib', 220000, 'pcs', 1), I('Baby Car Seat', 150000, 'pcs', 0.5),
+   I('Boneka', 50000, 'pcs', 0.25), I('Mattras Baby', 130000, 'pcs', 0.75) ] },
+ { n: 'Cuci AC', t: 0, min: 0, free: false, items: [
+   I('Cuci AC 0,5–1 PK', 85000, 'unit', 0.5, { tiers: [[1, 85000], [2, 75000]], note: 'Order 2 unit atau lebih: Rp75.000 per unit' }), I('Cuci AC 1,5–2 PK', 110000, 'unit', 0.75),
+   I('Tambah Freon R22 (0,5–1 PK)', 180000, 'unit', 0.5), I('Tambah Freon R32/R410A (1,5–2 PK)', 260000, 'unit', 0.5),
+   I('Isi Ulang Freon Penuh', 380000, 'unit', 1), I('Combo Cuci + Tambah Freon', 230000, 'unit', 1) ] },
+ { n: 'Kulkas & Freezer', t: 0, min: 0, free: false, items: [
+   I('Deep Cleaning Kulkas 1 Pintu', 150000, 'unit', 1.5), I('Deep Cleaning Kulkas 2 Pintu', 250000, 'unit', 2), I('Deep Cleaning Kulkas Side by Side', 450000, 'unit', 3),
+   I('Freezer Box ≤ 200 Liter', 200000, 'unit', 1.5), I('Freezer Box 201–400 Liter', 300000, 'unit', 2), I('Freezer Box > 400 Liter (mulai dari)', 450000, 'unit', 3, { from: 1 }),
+   I('Showcase Chiller 1 Pintu', 250000, 'unit', 1.5), I('Showcase Chiller 2 Pintu', 400000, 'unit', 2), I('Showcase 3 Pintu (mulai dari)', 600000, 'unit', 3, { from: 1 }),
+   I('Add-on: Pembersihan Ice Maker', 50000, 'unit', 0.25), I('Add-on: Pembersihan Evaporator', 100000, 'unit', 0.5),
+   I('Add-on: Penghilangan Bau Ekstra', 50000, 'unit', 0.25), I('Add-on: Sanitizing Premium', 75000, 'unit', 0.25) ] },
+ { n: 'Toren & Grease Trap', t: 30000, min: 200000, free: true, items: [
+   I('Grease Trap', 300000, 'unit', 2), I('Toren 100–250 Liter', 200000, 'unit', 1.5), I('Toren 500–1000 Liter', 350000, 'unit', 2),
+   I('Toren 1500 Liter', 500000, 'unit', 2.5), I('Toren 2500 Liter', 650000, 'unit', 3), I('Toren 5000 Liter', 800000, 'unit', 4) ] },
+ { n: 'Decluttering', t: 0, min: 0, free: false, items: [
+   I('Essential (1–2 area) · mulai dari', 299000, 'paket', 4, { from: 1 }), I('Signature (3–4 area) · mulai dari', 599000, 'paket', 8, { from: 1 }),
+   I('Complete Home (seluruh rumah) · mulai dari', 1200000, 'paket', 16, { from: 1 }), I('Decluttering + Deep Cleaning · mulai dari', 1999000, 'paket', 24, { from: 1 }) ] },
+ { n: 'Moving Service', t: 30000, min: 200000, free: true, items: [
+   I('Moving Helper: 2 helper (3 jam)', 400000, 'paket', 6), I('Moving Helper: 2 helper (5 jam)', 600000, 'paket', 10),
+   I('Tambahan helper (per jam per orang)', 100000, 'jam-orang', 1),
+   I('Pickup + 2 helper', 850000, 'paket', 12), I('Pickup + 3 helper', 1050000, 'paket', 18),
+   I('Truk Kecil (CDD) + 2 helper', 1350000, 'paket', 12), I('Truk Kecil (CDD) + 3 helper', 1050000, 'paket', 18, { note: 'Harga di pricelist sama dengan 2 helper, kemungkinan salah ketik. Tim akan konfirmasi.' }),
+   I('Truk Sedang + 2 helper', 1750000, 'paket', 12), I('Truk Sedang + 3 helper', 1950000, 'paket', 18),
+   I('Truk Engkel / Besar + 2 helper', 2300000, 'paket', 12), I('Truk Engkel / Besar + 3 helper', 2600000, 'paket', 18),
+   I('Jarak 21–40 km (Zona 2)', 200000, 'zona', 0), I('Jarak 41–60 km (Zona 3)', 400000, 'zona', 0) ] }
+];
+const DISC_MIN = 1000000, DISC_PCT = 10;
+
+// Pengaturan bawaan (dipakai kalau admin belum menyimpan pengaturan)
+let settings = { openHour: 8, closeHour: 17, staff: ['Cleaner 1', 'Cleaner 2'], maxDaysAhead: 45, minLeadDays: 1, daysOff: [], closedDates: [] };
+
+const pad = n => String(n).padStart(2, '0');
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const rp = n => 'Rp' + Math.round(n).toLocaleString('id-ID');
+const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const slug = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'x';
+const MONTHS = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const DAYS = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+
+let viewY, viewM, lockMap = {};
+let selDate = '', selStart = null, coords = null;
+let cart = [];                 // [{ id: 'c.i', q }]
+const staffSel = new Set();    // nama staf terpilih
+
+function minDate() { const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate() + (settings.minLeadDays || 0)); return d; }
+function maxDate() { const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate() + (settings.maxDaysAhead || 45)); return d; }
+const span = () => (settings.closeHour || 17) - (settings.openHour || 8);
+
+async function loadSettings() {
+  try {
+    const snap = await getDoc(doc(db, 'publicSettings', 'main'));
+    if (snap.exists()) {
+      const x = snap.data();
+      settings = { ...settings, ...x };
+      if (!Array.isArray(x.staff) || !x.staff.length) settings.staff = ['Cleaner 1', 'Cleaner 2'];
+      if (!x.openHour) settings.openHour = 8;
+      if (!x.closeHour) settings.closeHour = 17;
+    }
+  } catch (e) { console.warn('Pengaturan bawaan dipakai:', e.code || e); }
+}
+
+// ── Katalog & hitungan
+const findItem = id => { const [c, i] = id.split('.').map(Number); const cat = CATALOG[c]; return cat && cat.items[i] ? { cat, item: cat.items[i] } : null; };
+const tierPrice = (it, q) => { if (!it.tiers) return it.p; let p = it.tiers[0][1]; for (const [f, pr] of it.tiers) if (q >= f) p = pr; return p; };
+
+function calc() {
+  const k = staffSel.size, kk = Math.max(k, 1);
+  const r = { lines: [], errors: [], subtotal: 0, k, D: 0, est: false, cats: [] };
+  let sh = 0, hrs = 0;
+  for (const c of cart) {
+    const f = findItem(c.id); if (!f) continue;
+    const { cat, item } = f, q = c.q;
+    if (!(q > 0)) { r.errors.push(`${item.n}: isi jumlahnya`); continue; }
+    if (item.min && q < item.min) r.errors.push(`${item.n}: minimal ${item.min} ${item.u}`);
+    let unit;
+    if (item.hr) { unit = item.p * kk; hrs += q; } else { unit = tierPrice(item, q); sh += (item.h || 0) * q; }
+    if (item.from) r.est = true;
+    if (!r.cats.includes(cat)) r.cats.push(cat);
+    const total = Math.round(unit * q);
+    r.subtotal += total;
+    r.lines.push({ n: item.n, cat: cat.n, q, u: item.u, p: unit, t: total, from: !!item.from });
+  }
+  r.D = Math.ceil(sh / kk - 1e-9) + hrs;
+  if (r.lines.length && r.D < 1) r.D = 1;
+  const top = r.cats.slice().sort((a, b) => b.t - a.t)[0];
+  r.minOrder = r.cats.reduce((m, c) => Math.max(m, c.min), 0);
+  r.discount = r.subtotal >= DISC_MIN ? Math.round(r.subtotal * DISC_PCT / 100) : 0;
+  r.transport = top ? (r.discount && top.free ? 0 : top.t) : 0;
+  r.freeT = !!(top && top.t && r.discount && top.free);
+  r.total = r.subtotal - r.discount + r.transport;
+  r.over = r.D > span();
+  if (r.over) r.errors.push(`Durasi pekerjaan ${r.D} jam melebihi jam operasional satu hari (${span()} jam). Tambah jumlah cleaner atau kurangi itemnya.`);
+  if (r.lines.length && r.subtotal < r.minOrder) r.errors.push(`Minimal order ${rp(r.minOrder)} (belum termasuk transport). Saat ini ${rp(r.subtotal)}.`);
+  return r;
+}
+
+function renderCatalogSelects() {
+  $('cat').innerHTML = CATALOG.map((c, i) => `<option value="${i}">${esc(c.n)}</option>`).join('');
+  renderItemSelect();
+}
+function renderItemSelect() {
+  const c = CATALOG[+$('cat').value];
+  $('item').innerHTML = c.items.map((it, i) => `<option value="${i}">${esc(it.n)} — ${rp(it.p)}${it.hr ? '/jam/cleaner' : '/' + it.u}${it.from ? '+' : ''}</option>`).join('');
+  onItemChange();
+}
+function onItemChange() {
+  const it = CATALOG[+$('cat').value].items[+$('item').value];
+  $('qtyLabel').textContent = it.hr ? 'Lama pengerjaan (jam)' : `Jumlah (${it.u})`;
+  $('qty').min = it.min || 1; $('qty').value = it.min || (it.hr ? 3 : 1);
+  $('itemNote').textContent = it.note || (it.min ? `Minimal ${it.min} ${it.u}.` : '');
+}
+function addItem() {
+  const id = `${$('cat').value}.${$('item').value}`, q = parseFloat($('qty').value);
+  if (!(q > 0)) return;
+  const ex = cart.find(c => c.id === id);
+  if (ex) ex.q += q; else cart.push({ id, q });
+  refresh();
+}
+
+function renderCart() {
+  if (!cart.length) { $('cart').innerHTML = '<div class="hint" style="margin-top:10px">Belum ada layanan dipilih.</div>'; return; }
+  const r = calc();
+  $('cart').innerHTML = cart.map((c, idx) => {
+    const f = findItem(c.id), l = r.lines.find(x => x.n === f.item.n && x.cat === f.cat.n);
+    return `<div class="cartrow"><div class="nm">${esc(f.item.n)}<small>${esc(f.cat.n)}</small></div>
+      <div class="ctl"><input type="number" inputmode="decimal" min="1" step="1" value="${c.q}" data-i="${idx}" /> <span>${esc(f.item.u)}</span>
+      <button class="x" type="button" data-x="${idx}" aria-label="Hapus">×</button></div>
+      <div class="lt">${l ? rp(l.t) : ''}${f.item.from ? ' (estimasi)' : ''}</div></div>`;
+  }).join('');
+}
+function renderStaff() {
+  $('staffChips').innerHTML = (settings.staff || []).map(n => `<button type="button" class="chip ${staffSel.has(n) ? 'sel' : ''}" data-n="${esc(n)}">${esc(n)}</button>`).join('');
+}
+function renderSummary() {
+  const r = calc(), box = $('summary');
+  if (!r.lines.length) { box.innerHTML = ''; return; }
+  let h = `<div class="r"><span>Subtotal</span><span>${rp(r.subtotal)}</span></div>`;
+  if (r.discount) h += `<div class="r dis"><span>Diskon ${DISC_PCT}%</span><span>- ${rp(r.discount)}</span></div>`;
+  if (r.transport || r.freeT) h += `<div class="r"><span>Transport${r.freeT ? ' (gratis)' : ''}</span><span>${r.freeT ? 'Rp0' : rp(r.transport)}</span></div>`;
+  h += `<div class="r tot"><span>Estimasi total${r.est ? ' (mulai dari)' : ''}</span><span>${rp(r.total)}</span></div>`;
+  if (r.k) h += `<div class="note">Estimasi durasi di lokasi: <b>${r.D} jam</b> dengan ${r.k} cleaner.</div>`;
+  else h += '<div class="note">Pilih minimal satu staf untuk melihat durasi dan jadwal.</div>';
+  if (r.errors.length) h += `<div class="msg warn" style="margin-top:10px">${r.errors.map(esc).join('<br>')}</div>`;
+  box.innerHTML = h;
+}
+
+// ── Ketersediaan: staf × jam
+function freeStarts(dateKey) {
+  const r = calc(), out = [], o = settings.openHour, c = settings.closeHour, locks = lockMap[dateKey] || {};
+  const now = new Date(), today = dateKey === ymd(now);
+  for (let s = o; s + r.D <= c; s++) {
+    let ok = !(today && s <= now.getHours());
+    for (const n of staffSel) { const set = locks[slug(n)]; for (let h = s; ok && h < s + r.D; h++) if (set && set.has(h)) ok = false; }
+    out.push({ s, ok });
+  }
+  return out;
+}
+function ready() { const r = calc(); return r.lines.length > 0 && r.k > 0 && !r.over; }
+
+async function loadMonth(y, m) {
+  const start = `${y}-${pad(m + 1)}-01`, end = `${y}-${pad(m + 1)}-31`;
+  lockMap = {};
+  try {
+    const snap = await getDocs(query(collection(db, 'slotLocks'), where('date', '>=', start), where('date', '<=', end)));
+    snap.forEach(d => { const x = d.data(); if (!x.staff || x.hour == null) return; ((lockMap[x.date] ||= {})[x.staff] ||= new Set()).add(x.hour); });
+    $('calMsg').className = 'msg';
+  } catch (e) {
+    console.error(e);
+    $('calMsg').className = 'msg err';
+    $('calMsg').textContent = 'Jadwal belum bisa dimuat. Periksa koneksi internet lalu muat ulang halaman.';
+  }
+}
+function dayState(dt) {
+  const key = ymd(dt);
+  if (dt < minDate() || dt > maxDate() || (settings.daysOff || []).includes(dt.getDay()) || (settings.closedDates || []).includes(key)) return 'off';
+  const st = freeStarts(key), n = st.filter(x => x.ok).length;
+  if (!n) return 'full';
+  return n <= Math.max(1, Math.ceil(st.length * 0.3)) ? 'few' : 'ok';
+}
+function renderCal() {
+  $('monthLabel').textContent = `${MONTHS[viewM]} ${viewY}`;
+  $('dow').innerHTML = DAYS.map(d => `<div class="cal-dow">${d}</div>`).join('');
+  const first = new Date(viewY, viewM, 1), count = new Date(viewY, viewM + 1, 0).getDate();
+  let html = '';
+  for (let i = 0; i < first.getDay(); i++) html += '<button class="day empty" disabled></button>';
+  for (let d = 1; d <= count; d++) {
+    const dt = new Date(viewY, viewM, d), key = ymd(dt), st = dayState(dt);
+    html += `<button type="button" class="day ${st} ${key === selDate ? 'sel' : ''}" data-d="${key}" ${st === 'off' || st === 'full' ? 'disabled' : ''}>${d}</button>`;
+  }
+  $('cal').innerHTML = html;
+  const now = new Date();
+  $('prevM').disabled = viewY === now.getFullYear() && viewM <= now.getMonth();
+  const mx = maxDate();
+  $('nextM').disabled = viewY > mx.getFullYear() || (viewY === mx.getFullYear() && viewM >= mx.getMonth());
+}
+function renderSlots() {
+  const box = $('slots');
+  if (!selDate || !ready()) { box.innerHTML = ''; return; }
+  const D = calc().D;
+  box.innerHTML = freeStarts(selDate).map(({ s, ok }) =>
+    `<button type="button" class="slot ${ok ? '' : 'full'} ${s === selStart ? 'sel' : ''}" data-s="${s}" ${ok ? '' : 'disabled'}>
+      <b>${pad(s)}:00 – ${pad(s + D)}:00</b><small>${ok ? 'Tersedia' : 'Terisi'}</small></button>`).join('') || '<div class="hint">Durasi terlalu panjang untuk sisa jam hari ini.</div>';
+}
+function renderPicked() {
+  const p = $('picked');
+  if (selDate && selStart != null && ready()) {
+    const dt = new Date(selDate + 'T00:00:00'), D = calc().D;
+    p.style.display = 'block';
+    p.innerHTML = `✓ Jadwal dipilih: <b>${DAYS[dt.getDay()]}, ${dt.getDate()} ${MONTHS[dt.getMonth()]} ${dt.getFullYear()} · ${pad(selStart)}:00–${pad(selStart + D)}:00 WIB</b> (${[...staffSel].map(esc).join(', ')})`;
+  } else p.style.display = 'none';
+}
+function renderSchedule() {
+  const g = $('gate'), ok = ready();
+  if (!ok) {
+    const r = calc();
+    g.className = 'msg info'; g.style.display = 'block';
+    g.textContent = !r.lines.length ? 'Pilih layanan di langkah 1 dulu.' : (!r.k ? 'Pilih minimal satu staf di langkah 2 dulu.' : 'Perbaiki durasi pekerjaan di langkah 1–2 dulu.');
+    $('calWrap').style.display = 'none'; selStart = null; renderPicked(); return;
+  }
+  g.style.display = 'none'; $('calWrap').style.display = 'block';
+  if (selDate && selStart != null && !freeStarts(selDate).some(x => x.s === selStart && x.ok)) selStart = null;
+  renderCal(); renderSlots(); renderPicked();
+}
+function refresh() { renderCart(); renderSummary(); renderStaff(); renderSchedule(); }
+
+async function gotoMonth(y, m) {
+  viewY = y; viewM = m;
+  $('cal').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px;color:rgba(253,250,244,.5)">Memuat jadwal…</div>';
+  await loadMonth(y, m);
+  renderSchedule();
+}
+
+$('cat').onchange = renderItemSelect;
+$('item').onchange = onItemChange;
+$('btnAdd').onclick = addItem;
+$('cart').onclick = e => { const x = e.target.closest('[data-x]'); if (x) { cart.splice(+x.dataset.x, 1); refresh(); } };
+$('cart').onchange = e => { const i = e.target.closest('[data-i]'); if (!i) return; const v = parseFloat(i.value); if (v > 0) cart[+i.dataset.i].q = v; else cart.splice(+i.dataset.i, 1); refresh(); };
+$('staffChips').onclick = e => { const b = e.target.closest('.chip'); if (!b) return; const n = b.dataset.n; staffSel.has(n) ? staffSel.delete(n) : staffSel.add(n); refresh(); };
+$('prevM').onclick = () => { const d = new Date(viewY, viewM - 1, 1); gotoMonth(d.getFullYear(), d.getMonth()); };
+$('nextM').onclick = () => { const d = new Date(viewY, viewM + 1, 1); gotoMonth(d.getFullYear(), d.getMonth()); };
+$('cal').onclick = e => { const b = e.target.closest('.day'); if (!b || b.disabled) return; selDate = b.dataset.d; selStart = null; renderCal(); renderSlots(); renderPicked(); };
+$('slots').onclick = e => { const b = e.target.closest('.slot'); if (!b || b.disabled) return; selStart = +b.dataset.s; renderSlots(); renderPicked(); };
+
+// Lokasi
+$('btnLoc').onclick = () => {
+  if (!navigator.geolocation) { alert('Peramban Anda tidak mendukung lokasi.'); return; }
+  $('btnLoc').textContent = 'Mencari lokasi…';
+  navigator.geolocation.getCurrentPosition(pos => {
+    coords = { lat: +pos.coords.latitude.toFixed(6), lng: +pos.coords.longitude.toFixed(6) };
+    const url = `https://www.google.com/maps?q=${coords.lat},${coords.lng}`;
+    $('locOk').style.display = 'block';
+    $('locOk').innerHTML = `✓ Lokasi tersimpan · <a href="${url}" target="_blank" rel="noopener">Lihat di Google Maps</a>`;
+    $('btnLoc').textContent = '📍 Perbarui lokasi saya';
+  }, () => {
+    $('btnLoc').textContent = '📍 Gunakan lokasi saya sekarang';
+    alert('Lokasi tidak bisa diakses. Izinkan akses lokasi di peramban, atau tempel link Google Maps secara manual.');
+  }, { enableHighAccuracy: true, timeout: 12000 });
+};
+
+function showErr(t) { const m = $('formMsg'); m.className = 'msg err'; m.textContent = t; m.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+
+function normWA(v) {
+  let d = v.replace(/[^0-9]/g, '');
+  if (d.startsWith('0')) d = '62' + d.slice(1);
+  else if (d.startsWith('8')) d = '62' + d;
+  return d;
+}
+
+$('btnSubmit').onclick = async () => {
+  $('formMsg').className = 'msg';
+  if ($('website').value) return; // honeypot (bot)
+  const r = calc();
+  const name = $('name').value.trim(), address = $('address').value.trim(), wa = normWA($('wa').value);
+  if (!r.lines.length) return showErr('Pilih layanan terlebih dahulu.');
+  if (!r.k) return showErr('Pilih minimal satu staf cleaner.');
+  if (r.errors.length) return showErr(r.errors[0]);
+  if (!selDate || selStart == null) return showErr('Pilih tanggal dan jam mulai terlebih dahulu.');
+  if (name.length < 2) return showErr('Isi nama Anda.');
+  if (wa.length < 10 || wa.length > 15) return showErr('Nomor WhatsApp belum benar.');
+  if (address.length < 8) return showErr('Isi alamat selengkapnya.');
+
+  const btn = $('btnSubmit'); btn.disabled = true; btn.textContent = 'Mengunci jadwal…';
+  const bookingRef = doc(collection(db, 'bookings')), bookingId = bookingRef.id;
+  const staff = [...staffSel], D = r.D;
+  const lockIds = [];
+  staff.forEach(n => { for (let h = selStart; h < selStart + D; h++) lockIds.push(`${selDate}_${slug(n)}_${h}`); });
+  const mapsUrl = $('mapsUrl').value.trim() || (coords ? `https://www.google.com/maps?q=${coords.lat},${coords.lng}` : '');
+
+  const data = {
+    name, wa, address,
+    service: r.lines.map(l => l.n).join(', ').slice(0, 100),
+    duration: `${D} jam`,
+    landmark: $('landmark').value.trim(), notes: $('notes').value.trim(), source: $('source').value, mapsUrl,
+    date: selDate, slot: `${pad(selStart)}:00`, slotEnd: `${pad(selStart + D)}:00`, status: 'baru',
+    staff, hours: D,
+    items: r.lines.map(l => ({ n: l.n, c: l.cat, q: l.q, u: l.u, p: l.p, t: l.t })),
+    subtotal: r.subtotal, discount: r.discount, transport: r.transport, total: r.total, est: r.est,
+    lockIds
+  };
+  if (coords) { data.lat = coords.lat; data.lng = coords.lng; }
+
+  try {
+    const batch = writeBatch(db);
+    staff.forEach(n => { for (let h = selStart; h < selStart + D; h++) {
+      batch.set(doc(db, 'slotLocks', `${selDate}_${slug(n)}_${h}`), { date: selDate, staff: slug(n), hour: h, bookingId, createdAt: serverTimestamp() });
+    } });
+    batch.set(bookingRef, { ...data, createdAt: serverTimestamp() });
+    await batch.commit();
+  } catch (e) {
+    console.error(e);
+    btn.disabled = false; btn.textContent = 'Kirim Pesanan';
+    if (e.code === 'permission-denied') {
+      selStart = null;
+      await gotoMonth(viewY, viewM);
+      return showErr('Maaf, jam atau staf yang Anda pilih baru saja diambil pelanggan lain. Silakan pilih jam, tanggal, atau staf lain.');
+    }
+    return showErr('Pesanan belum terkirim karena gangguan koneksi. Coba lagi sebentar.');
+  }
+
+  // Berhasil
+  const code = 'BB-' + bookingId.slice(0, 6).toUpperCase();
+  const dt = new Date(selDate + 'T00:00:00');
+  const tgl = `${DAYS[dt.getDay()]}, ${dt.getDate()} ${MONTHS[dt.getMonth()]} ${dt.getFullYear()} · ${data.slot}–${data.slotEnd} WIB`;
+  $('doneCode').textContent = code;
+  const rows = [['Jadwal', tgl], ['Staf', staff.join(', ')], ...r.lines.map(l => [`${l.n} (${l.q} ${l.u})`, rp(l.t)])];
+  if (r.discount) rows.push([`Diskon ${DISC_PCT}%`, '- ' + rp(r.discount)]);
+  if (r.transport || r.freeT) rows.push(['Transport', r.freeT ? 'Gratis' : rp(r.transport)]);
+  rows.push([`Estimasi total${r.est ? ' (mulai dari)' : ''}`, rp(r.total)], ['Nama', name], ['Alamat', address]);
+  $('doneSum').innerHTML = rows.map(([a, b]) => `<div><span>${esc(a)}</span><span>${esc(b)}</span></div>`).join('');
+  const text = `Halo Panggil BersiBersih, saya sudah booking lewat form.\nKode: ${code}\nJadwal: ${tgl}\nStaf: ${staff.join(', ')}\n` +
+    r.lines.map(l => `- ${l.n} (${l.q} ${l.u}): ${rp(l.t)}`).join('\n') + `\nEstimasi total: ${rp(r.total)}\nNama: ${name}\nAlamat: ${address}`;
+  $('doneWA').href = `https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(text)}`;
+  $('formWrap').style.display = 'none'; $('doneWrap').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+(async () => {
+  await loadSettings();
+  renderCatalogSelects();
+  refresh();
+  const t = minDate();
+  await gotoMonth(t.getFullYear(), t.getMonth());
+})();
+</script>
+</body>
+</html>

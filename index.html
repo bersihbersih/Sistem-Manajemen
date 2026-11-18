@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Invoice · BersihBersih</title>
+  <title>Invoice · Panggil BersiBersih</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1C2D5A">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="BersihBersih">
+  <meta name="apple-mobile-web-app-title" content="Panggil BersiBersih">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
   <meta name="description" content="Aplikasi invoice profesional untuk jasa kebersihan BersihBersih">
-  <meta property="og:title" content="Invoice · BersihBersih">
+  <meta property="og:title" content="Invoice · Panggil BersiBersih">
   <meta property="og:description" content="Buat invoice jasa kebersihan dengan cepat dan profesional">
   <meta property="og:type" content="website">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -348,6 +348,7 @@
       font-family: 'Playfair Display', serif;
       font-size: 1.8rem; font-weight: 900; color: var(--navy);
     }
+    .preview-logo-img { height: 64px; width: auto; display: block; }
     .preview-brand small { display: block; font-size: 0.75rem; color: rgba(28,45,90,0.6); font-family: 'DM Sans', sans-serif; font-weight: 400; margin-top: 2px; letter-spacing: 1px; text-transform: uppercase; }
     .preview-inv-num { text-align: right; }
     .preview-inv-num .label { font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; color: rgba(28,45,90,0.6); font-weight: 600; }
@@ -931,6 +932,35 @@
     }
     .src-select { max-width: 150px; }
     .src-tag { display:inline-block; font-size:0.72rem; padding:2px 9px; border-radius:50px; background:var(--gold-pale); border:1px solid var(--gold-border); color:var(--gold-light); }
+
+    /* ── PESANAN MASUK (form order pelanggan) ── */
+    .bk-toolbar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:14px; }
+    .bk-toolbar select, .bk-toolbar input { width:auto; min-width:150px; padding:9px 12px; font-size:0.85rem; }
+    .bk-link { display:flex; gap:8px; flex-wrap:wrap; align-items:center; padding:12px 14px; border-radius:12px;
+      background: var(--gold-pale); border:1px solid var(--gold-border); font-size:0.82rem; margin-bottom:16px; }
+    .bk-link code { flex:1; min-width:180px; overflow-wrap:anywhere; color:var(--gold-light); font-family:'DM Mono',monospace; font-size:0.78rem; }
+    .bk-btn { background: rgba(255,255,255,0.10); color: var(--cream-light); border:1px solid var(--gold-border);
+      border-radius:50px; padding:7px 14px; font-size:0.78rem; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; text-decoration:none; display:inline-flex; align-items:center; gap:6px; }
+    .bk-btn:hover { background: rgba(255,255,255,0.18); }
+    .bk-btn.gold { background: var(--gold-bright); color: var(--navy-dark); border-color: var(--gold-bright); font-weight:700; }
+    .bk-btn.danger { color:#ef8a8a; border-color: rgba(239,107,107,0.4); }
+    .bk-card { border:1px solid var(--gold-border); border-left:4px solid var(--gold-bright); border-radius:12px; padding:14px 16px; margin-bottom:12px; background: rgba(255,255,255,0.04); }
+    .bk-card.dikonfirmasi { border-left-color:#3ecf8e; }
+    .bk-card.selesai { border-left-color:#7aa2ff; opacity:.8; }
+    .bk-card.dibatalkan { border-left-color:#ef6b6b; opacity:.6; }
+    .bk-top { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
+    .bk-name { font-weight:700; font-size:1rem; }
+    .bk-code { font-family:'DM Mono',monospace; font-size:0.74rem; color:var(--gold-light); margin-left:8px; }
+    .bk-top select { width:auto; padding:6px 10px; font-size:0.8rem; }
+    .bk-when { font-weight:700; color:var(--gold-light); margin-bottom:4px; }
+    .bk-line { font-size:0.84rem; color:rgba(253,250,244,0.75); margin:2px 0; overflow-wrap:anywhere; }
+    .bk-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+    .bk-set { display:grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap:12px; margin-top:12px; }
+    .bk-days { display:flex; gap:6px; flex-wrap:wrap; }
+    .bk-days label { text-transform:none; letter-spacing:0; font-size:0.8rem; display:inline-flex; gap:5px; align-items:center;
+      padding:6px 10px; border:1px solid var(--gold-border); border-radius:50px; cursor:pointer; margin:0; font-weight:600; }
+    .bk-days input { width:auto; }
+    details.bk-details > summary { cursor:pointer; font-weight:700; color:var(--gold-light); padding:4px 0; }
   </style>
 
 <!-- ══════════════════════════ LOGIN OVERLAY CSS ══════════════════════════ -->
@@ -1255,6 +1285,11 @@
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
     Buat Invoice
   </button>
+  <button class="nav-tab" id="tab-bookings" onclick="switchTab('bookings')">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Pesanan Masuk
+    <span class="tab-badge" id="bookings-count">0</span>
+  </button>
   <button class="nav-tab" onclick="switchTab('dashboard')">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
     Dashboard
@@ -1411,7 +1446,7 @@
   <div id="preview-section">
     <div class="preview-header">
       <div>
-        <div class="preview-brand">Bersih<span style="color:var(--navy)">Bersih</span>
+        <div class="preview-brand"><img src="icons/logo-panggil-bersibersih-navy.png" alt="Panggil BersiBersih" class="preview-logo-img">
           <small>Revined Clean | Elevated Living · Est. 2026</small>
         </div>
       </div>
@@ -1426,7 +1461,7 @@
       <div class="preview-parties">
         <div class="party-box">
           <div class="party-label">Dari</div>
-          <div class="party-name">BersihBersih</div>
+          <div class="party-name">Panggil BersiBersih</div>
           <div class="party-detail">Revined Clean | Elevated Living<br>📱 +62 821-2318-1255<br>🌐 bersihbersih.github.io</div>
         </div>
         <div class="party-box">
@@ -1469,8 +1504,8 @@
     </div>
 
     <div class="preview-footer-strip">
-      <span>Dokumen ini dibuat secara digital oleh sistem invoice BersihBersih</span>
-      <span class="seal"><span class="seal-dot"></span>BersihBersih · 2026</span>
+      <span>Dokumen ini dibuat secara digital oleh sistem invoice Panggil BersiBersih</span>
+      <span class="seal"><span class="seal-dot"></span>Panggil BersiBersih · 2026</span>
     </div>
 
     <div style="padding: 20px 36px 16px; display:flex; gap:14px; flex-wrap:wrap; align-items:center;">
@@ -1484,7 +1519,7 @@
       </button>
       <a id="btn-wa-bb" class="btn-secondary" href="https://wa.me/6282123181255" target="_blank" style="text-decoration:none;">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="color:#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        Konfirmasi ke BersihBersih
+        Konfirmasi ke Panggil BersiBersih
       </a>
       <button class="btn-secondary" onclick="printInvoice()" style="cursor:pointer;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
@@ -1499,6 +1534,57 @@
 <!-- ══════════════════════════════════
      PAGE: DASHBOARD
 ══════════════════════════════════ -->
+<div id="page-bookings" class="page">
+<main>
+  <div class="card">
+    <div class="card-title">Pesanan Masuk dari Form Pelanggan</div>
+
+    <div class="bk-link">
+      <span>🔗 Link form pelanggan:</span>
+      <code id="bk-link-text">—</code>
+      <button class="bk-btn gold" onclick="copyBookingLink()">Salin link</button>
+      <a class="bk-btn" id="bk-link-open" target="_blank" rel="noopener">Buka</a>
+    </div>
+
+    <details class="bk-details">
+      <summary>⚙️ Pengaturan ketersediaan &amp; layanan</summary>
+      <div class="bk-set">
+        <div class="field"><label>Jam buka</label><input type="number" id="bks-open" min="0" max="23" /></div>
+        <div class="field"><label>Jam tutup</label><input type="number" id="bks-close" min="1" max="24" /></div>
+        <div class="field"><label>Maks. hari ke depan</label><input type="number" id="bks-maxdays" min="1" max="365" /></div>
+        <div class="field"><label>Minimal booking H+</label><input type="number" id="bks-lead" min="0" max="30" /></div>
+      </div>
+      <div class="field" style="margin-top:12px;"><label>Daftar staf cleaner yang bisa dipilih customer (satu nama per baris)</label><textarea id="bks-staff" style="min-height:90px;" placeholder="Nama staf 1&#10;Nama staf 2"></textarea></div>
+      <div class="field"><label>Hari libur mingguan (kosongkan jika buka setiap hari)</label>
+        <div class="bk-days" id="bks-days">
+          <label><input type="checkbox" value="1" />Sen</label><label><input type="checkbox" value="2" />Sel</label>
+          <label><input type="checkbox" value="3" />Rab</label><label><input type="checkbox" value="4" />Kam</label>
+          <label><input type="checkbox" value="5" />Jum</label><label><input type="checkbox" value="6" />Sab</label>
+          <label><input type="checkbox" value="0" />Min</label>
+        </div>
+      </div>
+      <div class="field"><label>Tanggal tutup khusus (format 2026-12-25, pisahkan koma)</label><textarea id="bks-closed" style="min-height:60px;"></textarea></div>
+      <div class="hint" style="margin-bottom:12px;">Daftar layanan dan harga sekarang mengikuti pricelist yang tertanam di pesan.html.</div>
+      <button class="btn-primary" onclick="saveBkSettings()" style="padding:11px 24px;">Simpan Pengaturan</button>
+    </details>
+  </div>
+
+  <div class="card" style="margin-top:20px;">
+    <div class="bk-toolbar">
+      <select id="bk-filter" onchange="renderBookings()">
+        <option value="">Semua Status</option>
+        <option value="baru">Baru</option>
+        <option value="dikonfirmasi">Dikonfirmasi</option>
+        <option value="selesai">Selesai</option>
+        <option value="dibatalkan">Dibatalkan</option>
+      </select>
+      <input type="text" id="bk-search" placeholder="🔍 Cari nama / kode..." oninput="renderBookings()" />
+    </div>
+    <div id="bk-list"></div>
+  </div>
+</main>
+</div>
+
 <div id="page-dashboard" class="page">
 <main>
   <!-- Stats Row -->
@@ -1923,14 +2009,14 @@ async function initFirebase() {
   try {
     const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
     const { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-    const { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, query, orderBy, deleteDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
 
     const app = initializeApp(FIREBASE_CONFIG);
     _auth = getAuth(app);
     _db   = getFirestore(app);
 
     window._fbAuth = { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut };
-    window._fbStore = { doc, getDoc, setDoc, updateDoc, onSnapshot };
+    window._fbStore = { doc, getDoc, setDoc, updateDoc, onSnapshot, collection, query, orderBy, deleteDoc, serverTimestamp };
     _firebase_ready = true;
     return true;
   } catch(e) {
@@ -2185,6 +2271,8 @@ function doLogout() {
     signOut(_auth).catch(() => {});
   }
   clearSession();
+  if (_unsubBookings) { _unsubBookings(); _unsubBookings = null; }
+  bookingsCache = []; _bookingsFirst = true;
   currentUser = null;
   cloudData = null;
   document.getElementById('main-app').style.display = 'none';
@@ -2242,6 +2330,7 @@ function initInvoiceApp() {
     this.dataset.manualEdit = '1';
   });
   setSyncState('synced', '✓ Tersinkron');
+  initBookings();
 }
 
 // ════════════════════════════════════════════════════
@@ -2291,9 +2380,10 @@ function switchTab(tab) {
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('page-' + tab).classList.add('active');
   const tabs = document.querySelectorAll('.nav-tab');
-  const tabMap = { invoice: 0, dashboard: 1, history: 2, customers: 3, cashflow: 4 };
+  const tabMap = { invoice: 0, bookings: 1, dashboard: 2, history: 3, customers: 4, cashflow: 5 };
   if (tabMap[tab] !== undefined) tabs[tabMap[tab]].classList.add('active');
 
+  if (tab === 'bookings') renderBookings();
   if (tab === 'dashboard') renderDashboard();
   if (tab === 'history') renderHistory();
   if (tab === 'customers') renderCustomers();
@@ -2586,7 +2676,7 @@ function buildWAMessage({ num, dateVal, dueVal, custName, custAddr, items, subto
   const pad = (label, val) => `  ${label.padEnd(22, ' ')}${val}`;
   const lines = [
     `━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    `🧹 *bersihbersih*`,
+    `🧹 *Panggil BersiBersih*`,
     `    _Jasa Kebersihan Profesional_`,
     `━━━━━━━━━━━━━━━━━━━━━━━━━━`,
     ``,`📄 *INVOICE ${num}*`,
@@ -2639,7 +2729,7 @@ function buildWAMessage({ num, dateVal, dueVal, custName, custAddr, items, subto
 function downloadPDF() {
   const invNum = document.getElementById('invNumber').value || 'invoice';
   const prevTitle = document.title;
-  document.title = `Invoice-BersihBersih-${invNum}`;
+  document.title = `Invoice-PanggilBersiBersih-${invNum}`;
   window.print();
   document.title = prevTitle;
 }
@@ -2801,6 +2891,7 @@ const ORDER_SOURCES = [
   { v: 'referral',    label: 'Referral / Rekomendasi',   icon: '🤝' },
   { v: 'repeat',      label: 'Pelanggan Lama (Repeat)',  icon: '🔁' },
   { v: 'whatsapp',    label: 'WhatsApp / Langsung',      icon: '💬' },
+  { v: 'form-online', label: 'Form Order Online',        icon: '📝' },
   { v: 'lainnya',     label: 'Lainnya',                  icon: '✨' },
 ];
 
@@ -2904,6 +2995,243 @@ function renderSourceStats() {
         <button onclick="goFillSources()">Lengkapi sekarang</button>
       </div>`;
   }
+}
+
+// ══════════════════════════════════
+//   PESANAN MASUK (FORM PELANGGAN)
+// ══════════════════════════════════
+const DEFAULT_BK = {
+  openHour: 8,
+  closeHour: 17,
+  staff: ['Cleaner 1', 'Cleaner 2'],
+  maxDaysAhead: 45,
+  minLeadDays: 1,
+  daysOff: [],
+  closedDates: []
+};
+let bkSettings = { ...DEFAULT_BK };
+let bookingsCache = [];
+let _unsubBookings = null;
+let _bookingsFirst = true;
+const BK_DAYS = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+const BK_MONTHS = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+
+function escHTML(t) { return String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function bookingFormUrl() {
+  return location.protocol.startsWith('http')
+    ? new URL('pesan.html', location.href).href
+    : 'https://bersihbersih.github.io/aplikasi_invoice/pesan.html';
+}
+function copyBookingLink() {
+  const url = bookingFormUrl();
+  (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject())
+    .then(() => showToast('✓ Link form disalin'))
+    .catch(() => prompt('Salin link berikut:', url));
+}
+
+function initBookings() {
+  const url = bookingFormUrl();
+  const lt = document.getElementById('bk-link-text'), lo = document.getElementById('bk-link-open');
+  if (lt) lt.textContent = url;
+  if (lo) lo.href = url;
+  if (!_firebase_ready || !_db || !currentUser || !window._fbStore.collection) return;
+  loadBkSettings();
+  if (_unsubBookings) _unsubBookings();
+  _bookingsFirst = true;
+  const { collection, query, orderBy, onSnapshot } = window._fbStore;
+  _unsubBookings = onSnapshot(query(collection(_db, 'bookings'), orderBy('createdAt', 'desc')), snap => {
+    if (!_bookingsFirst) {
+      snap.docChanges().forEach(c => {
+        if (c.type === 'added' && !c.doc.metadata.hasPendingWrites) showToast('🔔 Pesanan baru masuk: ' + (c.doc.data().name || ''));
+      });
+    }
+    _bookingsFirst = false;
+    bookingsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    updateBookingBadge();
+    if (document.getElementById('page-bookings').classList.contains('active')) renderBookings();
+  }, err => {
+    console.warn('Pesanan masuk tidak bisa dibaca:', err);
+    const l = document.getElementById('bk-list');
+    if (l) l.innerHTML = '<div class="empty-state"><div class="empty-icon">🔒</div><p>Pesanan belum bisa dibaca. Pastikan aturan Firestore sudah diperbarui dan UID admin sudah benar.</p></div>';
+  });
+}
+
+function updateBookingBadge() {
+  const el = document.getElementById('bookings-count');
+  if (el) el.textContent = bookingsCache.filter(b => b.status === 'baru').length;
+}
+
+// ── Pengaturan
+async function loadBkSettings() {
+  const { doc, getDoc, setDoc } = window._fbStore;
+  const ref = doc(_db, 'publicSettings', 'main');
+  try {
+    const snap = await getDoc(ref);
+    if (snap.exists()) bkSettings = { ...DEFAULT_BK, ...snap.data() };
+    else { await setDoc(ref, DEFAULT_BK); bkSettings = { ...DEFAULT_BK }; }
+  } catch (e) { console.warn('Pengaturan form belum bisa dimuat:', e); }
+  fillBkSettingsForm();
+}
+function fillBkSettingsForm() {
+  const g = id => document.getElementById(id);
+  if (!g('bks-open')) return;
+  g('bks-open').value    = bkSettings.openHour || 8;
+  g('bks-close').value   = bkSettings.closeHour || 17;
+  g('bks-maxdays').value = bkSettings.maxDaysAhead;
+  g('bks-lead').value    = bkSettings.minLeadDays;
+  g('bks-staff').value   = (bkSettings.staff || []).join('\n');
+  g('bks-closed').value  = (bkSettings.closedDates || []).join(', ');
+  g('bks-days').querySelectorAll('input').forEach(i => { i.checked = (bkSettings.daysOff || []).includes(+i.value); });
+}
+async function saveBkSettings() {
+  const g = id => document.getElementById(id);
+  const open = parseInt(g('bks-open').value), close = parseInt(g('bks-close').value);
+  if (!(open >= 0 && close > open && close <= 24)) return showToast('⚠️ Jam buka/tutup belum benar, contoh 8 dan 17');
+  const staff = [...new Set(g('bks-staff').value.split('\n').map(x => x.trim()).filter(Boolean))];
+  if (!staff.length) return showToast('⚠️ Isi minimal satu nama staf');
+  const obj = {
+    openHour: open, closeHour: close,
+    maxDaysAhead: Math.max(1, parseInt(g('bks-maxdays').value) || 45),
+    minLeadDays: Math.max(0, parseInt(g('bks-lead').value) || 0),
+    staff,
+    daysOff: [...g('bks-days').querySelectorAll('input:checked')].map(i => +i.value),
+    closedDates: g('bks-closed').value.split(/[,\n]/).map(x => x.trim()).filter(x => /^\d{4}-\d{2}-\d{2}$/.test(x))
+  };
+  try {
+    const { doc, setDoc } = window._fbStore;
+    await setDoc(doc(_db, 'publicSettings', 'main'), obj);
+    bkSettings = obj;
+    showToast('✓ Pengaturan form disimpan');
+  } catch (e) {
+    console.error(e);
+    showToast('⚠️ Gagal menyimpan. Cek UID admin di aturan Firestore.');
+  }
+}
+
+// ── Daftar pesanan
+function bkWhen(b) {
+  const d = new Date(b.date + 'T00:00:00');
+  return `${BK_DAYS[d.getDay()]}, ${d.getDate()} ${BK_MONTHS[d.getMonth()]} ${d.getFullYear()} · ${b.slot}${b.slotEnd ? '–' + b.slotEnd : ''} WIB`;
+}
+function bkMapsUrl(b) {
+  if (b.mapsUrl) return b.mapsUrl;
+  if (b.lat && b.lng) return `https://www.google.com/maps?q=${b.lat},${b.lng}`;
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(b.address || '')}`;
+}
+const bkRp = n => 'Rp' + Math.round(n || 0).toLocaleString('id-ID');
+function bkWaUrl(b) {
+  const lines = (b.items || []).map(i => `- ${i.n} (${i.q} ${i.u}): ${bkRp(i.t)}`).join('\n');
+  const msg = `Halo ${b.name}, terima kasih sudah memesan di Panggil BersiBersih.\n\nJadwal: ${bkWhen(b)}\n` +
+    (b.staff && b.staff.length ? `Staf: ${b.staff.join(', ')}\n` : '') +
+    `Alamat: ${b.address}\n` + (lines ? `\nPesanan:\n${lines}\nEstimasi total: ${bkRp(b.total)}${b.est ? ' (ada item mulai dari)' : ''}\n` : '') +
+    `\nKami konfirmasi jadwal dan detailnya ya. Boleh dibantu info kondisi area/item agar estimasi bisa kami pastikan? 🙏`;
+  return `https://wa.me/${b.wa}?text=${encodeURIComponent(msg)}`;
+}
+
+function renderBookings() {
+  const list = document.getElementById('bk-list');
+  if (!list) return;
+  const f = document.getElementById('bk-filter').value;
+  const q = document.getElementById('bk-search').value.toLowerCase().trim();
+  const rows = bookingsCache.filter(b => {
+    if (f && b.status !== f) return false;
+    if (q && !((b.name || '').toLowerCase().includes(q) || ('BB-' + b.id.slice(0, 6)).toLowerCase().includes(q))) return false;
+    return true;
+  });
+  if (!rows.length) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>Belum ada pesanan dari form pelanggan</p></div>';
+    return;
+  }
+  const stOpt = cur => ['baru', 'dikonfirmasi', 'selesai', 'dibatalkan']
+    .map(s => `<option value="${s}" ${cur === s ? 'selected' : ''}>${s.charAt(0).toUpperCase() + s.slice(1)}</option>`).join('');
+  list.innerHTML = rows.map(b => `
+    <div class="bk-card ${escHTML(b.status)}">
+      <div class="bk-top">
+        <div><span class="bk-name">${escHTML(b.name)}</span><span class="bk-code">BB-${escHTML(b.id.slice(0, 6).toUpperCase())}</span></div>
+        <select onchange="setBookingStatus('${b.id}', this.value)">${stOpt(b.status)}</select>
+      </div>
+      <div class="bk-when">📅 ${escHTML(bkWhen(b))}</div>
+      <div class="bk-line">🧹 ${b.items && b.items.length ? b.items.map(i => escHTML(i.n) + ' (' + escHTML(i.q) + ' ' + escHTML(i.u) + ')').join(', ') : escHTML(b.service)}${b.duration ? ' · ' + escHTML(b.duration) : ''}</div>
+      ${b.staff && b.staff.length ? `<div class="bk-line">👤 Staf: ${b.staff.map(escHTML).join(', ')}</div>` : ''}
+      ${b.total ? `<div class="bk-line">💰 Estimasi ${bkRp(b.total)}${b.discount ? ' (diskon ' + bkRp(b.discount) + ')' : ''}${b.transport ? ' · transport ' + bkRp(b.transport) : ''}${b.est ? ' · ada item mulai dari' : ''}</div>` : ''}
+      <div class="bk-line">📍 ${escHTML(b.address)}${b.landmark ? ' (' + escHTML(b.landmark) + ')' : ''}</div>
+      <div class="bk-line">📱 ${escHTML(b.wa)}</div>
+      ${b.notes ? `<div class="bk-line">📝 ${escHTML(b.notes)}</div>` : ''}
+      ${b.source ? `<div class="bk-line">🎯 Tahu dari: ${escHTML(sourceLabel(b.source))}</div>` : ''}
+      <div class="bk-actions">
+        <a class="bk-btn" href="${bkWaUrl(b)}" target="_blank" rel="noopener">💬 WhatsApp</a>
+        <a class="bk-btn" href="${escHTML(bkMapsUrl(b))}" target="_blank" rel="noopener">🗺️ Buka di Maps</a>
+        <button class="bk-btn gold" onclick="makeInvoiceFromBooking('${b.id}')">🧾 Buat Invoice</button>
+        <button class="bk-btn danger" onclick="deleteBooking('${b.id}')">Hapus</button>
+      </div>
+    </div>`).join('');
+}
+
+const bkLockIds = b => (b.lockIds && b.lockIds.length) ? b.lockIds : (b.lockId ? [b.lockId] : []);
+
+async function setBookingStatus(id, status) {
+  const b = bookingsCache.find(x => x.id === id);
+  if (!b || b.status === status) return;
+  const { doc, getDoc, setDoc, updateDoc, deleteDoc, serverTimestamp } = window._fbStore;
+  try {
+    const ids = bkLockIds(b);
+    if (status === 'dibatalkan') {
+      for (const l of ids) await deleteDoc(doc(_db, 'slotLocks', l));      // jadwal kembali tersedia
+    } else if (b.status === 'dibatalkan') {
+      for (const l of ids) {                                                // aktifkan lagi → pastikan belum diambil orang lain
+        if ((await getDoc(doc(_db, 'slotLocks', l))).exists()) { showToast('⚠️ Jadwal/staf itu sudah terisi pesanan lain'); renderBookings(); return; }
+      }
+      for (const l of ids) {
+        const p = l.split('_');
+        const data = b.lockIds ? { date: p[0], staff: p[1], hour: parseInt(p[2]), bookingId: id, createdAt: serverTimestamp() }
+                               : { date: b.date, slot: b.slot, n: parseInt(p[p.length - 1]), bookingId: id, createdAt: serverTimestamp() };
+        await setDoc(doc(_db, 'slotLocks', l), data);
+      }
+    }
+    await updateDoc(doc(_db, 'bookings', id), { status });
+    showToast(status === 'dibatalkan' ? '✓ Dibatalkan, jadwal kembali tersedia' : '✓ Status diperbarui');
+  } catch (e) {
+    console.error(e);
+    showToast('⚠️ Gagal memperbarui status');
+    renderBookings();
+  }
+}
+
+async function deleteBooking(id) {
+  const b = bookingsCache.find(x => x.id === id);
+  if (!b) return;
+  if (!confirm(`Hapus pesanan ${b.name}? Jadwalnya akan kembali tersedia.`)) return;
+  const { doc, deleteDoc } = window._fbStore;
+  try {
+    for (const l of bkLockIds(b)) await deleteDoc(doc(_db, 'slotLocks', l));
+    await deleteDoc(doc(_db, 'bookings', id));
+    showToast('✓ Pesanan dihapus');
+  } catch (e) { console.error(e); showToast('⚠️ Gagal menghapus'); }
+}
+
+function makeInvoiceFromBooking(id) {
+  const b = bookingsCache.find(x => x.id === id);
+  if (!b) return;
+  switchTab('invoice');
+  document.getElementById('custName').value = b.name || '';
+  document.getElementById('custWA').value = b.wa || '';
+  document.getElementById('custAddress').value = b.address || '';
+  const known = ORDER_SOURCES.some(s => s.v === b.source);
+  document.getElementById('orderSource').value = known ? b.source : 'form-online';
+  document.getElementById('orderSourceDetail').value = 'Via form online · ' + (b.date || '');
+  if (b.items && b.items.length) {
+    items = b.items.map(i => ({ id: Date.now() + Math.random(), name: `${i.n}${i.c ? ' (' + i.c + ')' : ''}`, qty: i.q, price: i.p }));
+    const gd = document.getElementById('discountPct'), gx = document.getElementById('extraFee');
+    if (gd) gd.value = b.discount ? 10 : '';
+    if (gx) gx.value = b.transport || '';
+  } else {
+    const hrs = (b.duration || '').match(/(\d+)\s*jam/);
+    items = [{ id: Date.now() + Math.random(), name: b.service || '', qty: hrs ? parseInt(hrs[1]) : 1, price: 0 }];
+  }
+  renderItems();
+  recalc();
+  showToast(b.items && b.items.length ? '✓ Pesanan, harga, diskon, dan transport dimasukkan ke form invoice' : '✓ Data pesanan dimasukkan ke form invoice, tinggal isi harga');
 }
 
 // ══════════════════════════════════
