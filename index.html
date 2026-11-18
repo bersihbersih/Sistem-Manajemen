@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Invoice · Panggil BersiBersih</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1C2D5A">
@@ -1171,6 +1171,28 @@
 .user-dropdown-divider { height: 1px; background: rgba(184,146,42,0.15); margin: 4px 0; }
 .user-dropdown-header { padding: 10px 14px 6px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(253,250,244,0.35); font-weight: 700; }
 .header-right-wrap { position: relative; display: flex; align-items: center; gap: 10px; }
+</style>
+<style>
+/* ── PERBAIKAN TAMPILAN HP: cegah halaman melebar / terlihat ter-zoom ── */
+html, body { max-width: 100%; overflow-x: hidden; -webkit-text-size-adjust: 100%; }
+main { grid-template-columns: minmax(0, 1fr); }
+main > *, .page, .card { min-width: 0; max-width: 100%; }
+.cf-table-wrap, .history-table-wrap { max-width: 100%; }
+header { height: auto !important; min-height: 64px; padding-top: env(safe-area-inset-top, 0px); gap: 10px; }
+.logo-img-wrap { min-width: 0; flex-shrink: 1; }
+.logo-img { max-width: 100%; }
+.header-right-wrap { display: flex; align-items: center; gap: 8px; min-width: 0; flex-shrink: 1; position: relative; }
+.user-chip { min-width: 0; max-width: 100%; }
+#user-chip-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 140px; }
+@media (max-width: 520px) {
+  header { min-height: 56px; padding-left: 12px; padding-right: 12px; gap: 6px; }
+  .logo-img { height: 36px; }
+  .header-right-wrap { gap: 6px; }
+  .sync-badge { padding: 4px 8px; font-size: 0.66rem; }
+  .user-chip { padding: 3px; }
+  #user-chip-name { display: none; }
+  .nav-tabs { padding-left: 0; }
+}
 </style>
 </head>
 <body>
