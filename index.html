@@ -670,6 +670,17 @@
     }
 
     /* Modal */
+    .bke-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+    .bke-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .bke-chip { padding: 7px 14px; border-radius: 50px; border: 1.5px solid var(--border, #d9d2c3); background: transparent; color: inherit; font: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
+    .bke-chip.sel { background: var(--gold, #b8902e); border-color: var(--gold, #b8902e); color: #fff; }
+    .bke-item { display: grid; grid-template-columns: 1fr 64px 64px 96px 28px; gap: 6px; align-items: center; margin-bottom: 6px; }
+    .bke-item input { width: 100%; min-width: 0; padding: 8px 8px; }
+    .bke-item .x { background: none; border: none; color: #c0392b; font-size: 1.2rem; cursor: pointer; }
+    .bke-hd { font-size: 0.72rem; opacity: .65; margin-bottom: 4px; display: grid; grid-template-columns: 1fr 64px 64px 96px 28px; gap: 6px; }
+    .bke-sum { font-size: 0.9rem; border-top: 1px solid var(--border, #d9d2c3); padding-top: 10px; }
+    .bke-sum div { display: flex; justify-content: space-between; padding: 2px 0; }
+    .bke-sum .tot { font-weight: 800; font-size: 1.02rem; }
     .modal-backdrop {
       display: none; position: fixed; inset: 0;
       background: rgba(10,15,35,0.8);
@@ -1907,6 +1918,35 @@
 </div>
 
 <!-- MODAL: Tambah / Edit Pelanggan -->
+<div class="modal-backdrop" id="modal-bkedit">
+  <div class="modal" style="max-width:640px;max-height:92vh;overflow:auto;">
+    <div class="modal-title">✏️ Edit Pesanan <span id="bke-code" style="opacity:.6;font-size:.8em;"></span></div>
+    <div class="modal-fields">
+      <div class="bke-grid">
+        <div class="field"><label>Tanggal</label><input type="date" id="bke-date" /></div>
+        <div class="field"><label>Jam tiba di lokasi</label><input type="time" id="bke-start" /></div>
+        <div class="field"><label>Estimasi selesai</label><input type="time" id="bke-end" /></div>
+      </div>
+      <div class="field"><label>Staf cleaner</label><div class="bke-chips" id="bke-staff"></div></div>
+      <div class="field"><label>Layanan &amp; harga</label>
+        <div class="bke-hd"><span>Nama</span><span>Jml</span><span>Satuan</span><span>Harga/sat.</span><span></span></div>
+        <div id="bke-items"></div>
+        <button type="button" class="bk-btn" onclick="bkeAddItem()">+ Tambah item</button>
+      </div>
+      <div class="bke-grid">
+        <div class="field"><label>Diskon (%)</label><input type="number" id="bke-disc" min="0" max="100" oninput="bkeTotals()" /></div>
+        <div class="field"><label>Transport (Rp)</label><input type="number" id="bke-trans" min="0" oninput="bkeTotals()" /></div>
+      </div>
+      <div class="field"><label>Alamat</label><input type="text" id="bke-addr" /></div>
+      <div class="bke-sum" id="bke-sum"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" type="button" onclick="closeBookingEdit()">Batal</button>
+      <button class="btn btn-primary" type="button" id="bke-save" onclick="bkeSave()">Simpan Perubahan</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-backdrop" id="modal-customer">
   <div class="modal">
     <div class="modal-title" id="modal-cust-title">Tambah Pelanggan</div>
@@ -3121,11 +3161,21 @@ function bkMapsUrl(b) {
 }
 const bkRp = n => 'Rp' + Math.round(n || 0).toLocaleString('id-ID');
 function bkWaUrl(b) {
+  const d = new Date(b.date + 'T00:00:00');
+  const tgl = `${BK_DAYS[d.getDay()]}, ${d.getDate()} ${BK_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
   const lines = (b.items || []).map(i => `- ${i.n} (${i.q} ${i.u}): ${bkRp(i.t)}`).join('\n');
-  const msg = `Halo ${b.name}, terima kasih sudah memesan di Panggil BersiBersih.\n\nJadwal: ${bkWhen(b)}\n` +
-    (b.staff && b.staff.length ? `Staf: ${b.staff.join(', ')}\n` : '') +
-    `Alamat: ${b.address}\n` + (lines ? `\nPesanan:\n${lines}\nEstimasi total: ${bkRp(b.total)}${b.est ? ' (ada item mulai dari)' : ''}\n` : '') +
-    `\nKami konfirmasi jadwal dan detailnya ya. Boleh dibantu info kondisi area/item agar estimasi bisa kami pastikan? 🙏`;
+  let money = '';
+  if (lines) {
+    money = `\nRincian pesanan:\n${lines}\n` +
+      (b.discount ? `Diskon: -${bkRp(b.discount)}\n` : '') +
+      (b.transport ? `Transport: ${bkRp(b.transport)}\n` : '') +
+      `*Estimasi total: ${bkRp(b.total)}*${b.est ? ' (ada item mulai dari, harga final dikonfirmasi di lokasi)' : ''}\n`;
+  }
+  const msg = `Halo ${b.name}, terima kasih sudah memesan di Panggil BersiBersih 🙏\n\nBerikut konfirmasi pesanan Anda (kode BB-${b.id.slice(0, 6).toUpperCase()}):\n` +
+    `📅 ${tgl}\n🕘 Tim kami tiba di lokasi sekitar *${b.slot} WIB*` + (b.slotEnd ? `, estimasi selesai *${b.slotEnd} WIB*` : '') + `\n` +
+    (b.staff && b.staff.length ? `👤 Staf: ${b.staff.join(', ')}\n` : '') +
+    `📍 ${b.address}\n` + money +
+    `\nApakah jadwal dan rinciannya sudah sesuai? Mohon balas *YA* untuk konfirmasi, atau kabari kami jika ada yang ingin diubah.`;
   return `https://wa.me/${b.wa}?text=${encodeURIComponent(msg)}`;
 }
 
@@ -3162,10 +3212,109 @@ function renderBookings() {
       <div class="bk-actions">
         <a class="bk-btn" href="${bkWaUrl(b)}" target="_blank" rel="noopener">💬 WhatsApp</a>
         <a class="bk-btn" href="${escHTML(bkMapsUrl(b))}" target="_blank" rel="noopener">🗺️ Buka di Maps</a>
+        <button class="bk-btn" onclick="openBookingEdit('${b.id}')">✏️ Edit</button>
         <button class="bk-btn gold" onclick="makeInvoiceFromBooking('${b.id}')">🧾 Buat Invoice</button>
         <button class="bk-btn danger" onclick="deleteBooking('${b.id}')">Hapus</button>
       </div>
     </div>`).join('');
+}
+
+// ── Edit pesanan (admin)
+let bkEdit = null;
+const bkSlug = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'x';
+const bkMin = t => { const [a, b] = (t || '').split(':').map(Number); return (a || 0) * 60 + (b || 0); };
+const bkG = id => document.getElementById(id);
+
+function openBookingEdit(id) {
+  const b = bookingsCache.find(x => x.id === id);
+  if (!b) return;
+  const items = (b.items && b.items.length) ? b.items.map(i => ({ n: i.n, c: i.c || '', q: i.q, u: i.u || 'pcs', p: i.p })) : [{ n: b.service || '', c: '', q: 1, u: 'pcs', p: 0 }];
+  bkEdit = { id, staff: new Set(b.staff || []), items };
+  bkG('bke-code').textContent = 'BB-' + b.id.slice(0, 6).toUpperCase() + ' · ' + b.name;
+  bkG('bke-date').value = b.date;
+  bkG('bke-start').value = b.slot || '08:00';
+  bkG('bke-end').value = b.slotEnd || (String(Math.min(23, bkMin(b.slot) / 60 + 1 | 0)).padStart(2, '0') + ':00');
+  bkG('bke-disc').value = b.discountPct != null ? b.discountPct : (b.discount ? 10 : 0);
+  bkG('bke-trans').value = b.transport || 0;
+  bkG('bke-addr').value = b.address || '';
+  bkeRenderStaff(); bkeRenderItems(); bkeTotals();
+  bkG('modal-bkedit').classList.add('open');
+}
+function closeBookingEdit() { bkG('modal-bkedit').classList.remove('open'); bkEdit = null; }
+function bkeRenderStaff() {
+  const names = [...new Set([...(bkSettings.staff || []), ...bkEdit.staff])];
+  bkG('bke-staff').innerHTML = names.map(n => `<button type="button" class="bke-chip ${bkEdit.staff.has(n) ? 'sel' : ''}" data-n="${escHTML(n)}">${escHTML(n)}</button>`).join('') || '<span style="opacity:.6">Belum ada staf di Pengaturan</span>';
+}
+document.addEventListener('click', e => {
+  const c = e.target.closest && e.target.closest('.bke-chip'); if (!c || !bkEdit) return;
+  const n = c.dataset.n; bkEdit.staff.has(n) ? bkEdit.staff.delete(n) : bkEdit.staff.add(n); bkeRenderStaff();
+});
+function bkeRenderItems() {
+  bkG('bke-items').innerHTML = bkEdit.items.map((it, i) => `<div class="bke-item">
+    <input value="${escHTML(it.n)}" oninput="bkeSet(${i},'n',this.value)" />
+    <input type="number" step="any" min="0" value="${it.q}" oninput="bkeSet(${i},'q',this.value)" />
+    <input value="${escHTML(it.u)}" oninput="bkeSet(${i},'u',this.value)" />
+    <input type="number" min="0" value="${it.p}" oninput="bkeSet(${i},'p',this.value)" />
+    <button type="button" class="x" onclick="bkeDel(${i})" aria-label="Hapus">×</button></div>`).join('');
+}
+function bkeSet(i, k, v) { bkEdit.items[i][k] = (k === 'q' || k === 'p') ? (parseFloat(v) || 0) : v; bkeTotals(); }
+function bkeDel(i) { bkEdit.items.splice(i, 1); bkeRenderItems(); bkeTotals(); }
+function bkeAddItem() { bkEdit.items.push({ n: '', c: '', q: 1, u: 'pcs', p: 0 }); bkeRenderItems(); }
+function bkeCalc() {
+  const sub = bkEdit.items.reduce((s, i) => s + Math.round(i.q * i.p), 0);
+  const pct = Math.min(100, Math.max(0, parseFloat(bkG('bke-disc').value) || 0));
+  const disc = Math.round(sub * pct / 100), tr = Math.max(0, parseInt(bkG('bke-trans').value) || 0);
+  return { sub, pct, disc, tr, total: sub - disc + tr };
+}
+function bkeTotals() {
+  const c = bkeCalc();
+  bkG('bke-sum').innerHTML = `<div><span>Subtotal</span><span>${bkRp(c.sub)}</span></div>` +
+    (c.disc ? `<div><span>Diskon ${c.pct}%</span><span>- ${bkRp(c.disc)}</span></div>` : '') +
+    (c.tr ? `<div><span>Transport</span><span>${bkRp(c.tr)}</span></div>` : '') +
+    `<div class="tot"><span>Total</span><span>${bkRp(c.total)}</span></div>`;
+}
+async function bkeSave() {
+  const b = bookingsCache.find(x => x.id === bkEdit.id);
+  if (!b) return;
+  const date = bkG('bke-date').value, start = bkG('bke-start').value, end = bkG('bke-end').value;
+  if (!date || !start || !end) return showToast('⚠️ Isi tanggal, jam tiba, dan jam selesai');
+  const sMin = bkMin(start), eMin = bkMin(end);
+  if (eMin <= sMin) return showToast('⚠️ Jam selesai harus setelah jam tiba');
+  const items = bkEdit.items.filter(i => i.n.trim()).map(i => ({ n: i.n.trim(), c: i.c || '', q: i.q, u: (i.u || 'pcs').trim(), p: i.p, t: Math.round(i.q * i.p) }));
+  if (!items.length) return showToast('⚠️ Minimal satu layanan');
+  const c = bkeCalc(), staff = [...bkEdit.staff];
+  const { doc, getDoc, setDoc, updateDoc, deleteDoc, serverTimestamp } = window._fbStore;
+  const btn = bkG('bke-save'); btn.disabled = true; btn.textContent = 'Menyimpan…';
+  try {
+    // kunci jadwal per staf per jam yang tercakup jam tiba–selesai
+    const oldIds = bkLockIds(b), newIds = [];
+    if (staff.length) for (const n of staff) for (let h = Math.floor(sMin / 60); h < Math.ceil(eMin / 60); h++) newIds.push(`${date}_${bkSlug(n)}_${h}`);
+    const useLocks = staff.length && b.status !== 'dibatalkan';
+    if (useLocks) {
+      for (const l of newIds.filter(x => !oldIds.includes(x))) {
+        const s = await getDoc(doc(_db, 'slotLocks', l));
+        if (s.exists() && s.data().bookingId !== b.id) { showToast('⚠️ Staf/jam itu sudah terisi pesanan lain. Ubah jam atau staf.'); return; }
+      }
+      for (const l of oldIds.filter(x => !newIds.includes(x))) await deleteDoc(doc(_db, 'slotLocks', l));
+      for (const l of newIds.filter(x => !oldIds.includes(x))) {
+        const p = l.split('_');
+        await setDoc(doc(_db, 'slotLocks', l), { date: p[0], staff: p[1], hour: parseInt(p[2]), bookingId: b.id, createdAt: serverTimestamp() });
+      }
+    }
+    const mins = eMin - sMin;
+    await updateDoc(doc(_db, 'bookings', b.id), {
+      date, slot: start, slotEnd: end, staff, items, address: bkG('bke-addr').value.trim() || b.address,
+      subtotal: c.sub, discountPct: c.pct, discount: c.disc, transport: c.tr, total: c.total,
+      hours: Math.ceil(mins / 60), duration: `${Math.floor(mins / 60)} jam` + (mins % 60 ? ` ${mins % 60} menit` : ''),
+      service: items.map(i => i.n).join(', ').slice(0, 100),
+      lockIds: staff.length ? newIds : oldIds, edited: true
+    });
+    closeBookingEdit();
+    showToast('✓ Pesanan diperbarui. Klik WhatsApp untuk kirim konfirmasi.');
+  } catch (e) {
+    console.error(e);
+    showToast('⚠️ Gagal menyimpan perubahan');
+  } finally { btn.disabled = false; btn.textContent = 'Simpan Perubahan'; }
 }
 
 const bkLockIds = b => (b.lockIds && b.lockIds.length) ? b.lockIds : (b.lockId ? [b.lockId] : []);
@@ -3223,7 +3372,7 @@ function makeInvoiceFromBooking(id) {
   if (b.items && b.items.length) {
     items = b.items.map(i => ({ id: Date.now() + Math.random(), name: `${i.n}${i.c ? ' (' + i.c + ')' : ''}`, qty: i.q, price: i.p }));
     const gd = document.getElementById('discountPct'), gx = document.getElementById('extraFee');
-    if (gd) gd.value = b.discount ? 10 : '';
+    if (gd) gd.value = b.discountPct != null ? (b.discountPct || '') : (b.discount ? 10 : '');
     if (gx) gx.value = b.transport || '';
   } else {
     const hrs = (b.duration || '').match(/(\d+)\s*jam/);
